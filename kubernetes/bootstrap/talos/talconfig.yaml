@@ -3,7 +3,7 @@
 # renovate: datasource=docker depName=ghcr.io/siderolabs/installer
 talosVersion: v1.6.5
 # renovate: datasource=docker depName=ghcr.io/siderolabs/kubelet
-kubernetesVersion: v1.29.2
+kubernetesVersion: 1.29.2
 
 clusterName: ${clusterName}
 endpoint: "https://${clusterName}.${clusterDNSSuffix}:6443"
@@ -176,22 +176,22 @@ patches:
         fs.inotify.max_user_instances: 8192
         vm.nr_hugepages: 1024
 
-    # Configure nfs mount options
-    - |-
-      machine:
-        files:
-          - op: overwrite
-            path: /etc/nfsmount.conf
-            permissions: 0o644
-            content: |
-              [ NFSMount_Global_Options ]
-              nfsvers=4.2
-              hard=True
-              noatime=True
-              nodiratime=True
-              rsize=131072
-              wsize=131072
-              nconnect=8
+  # Configure nfs mount options
+  - |-
+    machine:
+      files:
+        - op: overwrite
+          path: /etc/nfsmount.conf
+          permissions: 0o644
+          content: |
+            [ NFSMount_Global_Options ]
+            nfsvers=4.2
+            hard=True
+            noatime=True
+            nodiratime=True
+            rsize=131072
+            wsize=131072
+            nconnect=8
 
   # Mount openebs-hostpath in kubelet
   - |-
@@ -213,14 +213,14 @@ patches:
         extraKernelArgs:
           - net.ifnames=0
 
-    # Configure cluster loopback
-    - |-
-      machine:
-        network:
-          extraHostEntries:
-            - ip: ${clusterEndpointIP}
-              aliases:
-                - ${clusterName}.${clusterDNSSuffix}
+  # Configure cluster loopback
+  - |-
+    machine:
+      network:
+        extraHostEntries:
+          - ip: ${clusterEndpointIP}
+            aliases:
+              - ${clusterName}.${clusterDNSSuffix}
 
 
 controlPlane:

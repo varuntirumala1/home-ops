@@ -8,3 +8,4 @@ resources:
   - ./metrics-server/ks.yaml
   - ./spegel/ks.yaml
   - ./reloader/ks.yaml
+  - ./coredns/ks.yaml
