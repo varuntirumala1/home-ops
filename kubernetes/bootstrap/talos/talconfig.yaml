@@ -5,25 +5,25 @@ talosVersion: v1.6.5
 # renovate: datasource=docker depName=ghcr.io/siderolabs/kubelet
 kubernetesVersion: v1.29.2
 
-clusterName: &cluster home-kubernetes
-endpoint: https://192.168.115.100:6443
+clusterName: ${clusterName}
+endpoint: "https://${clusterName}.${clusterDNSSuffix}:6443"
 clusterPodNets:
   - "10.42.0.0/16"
 clusterSvcNets:
   - "10.43.0.0/16"
 additionalApiServerCertSans: &sans
-  - "192.168.115.100"
-  - 127.0.0.1 # KubePrism
-  - "api.k8s.achva.network"
+  - ${clusterEndpointIP}
+  - ${clusterName}.${clusterDNSSuffix}
+  - "127.0.0.1" # KubePrism
 additionalMachineCertSans: *sans
 cniConfig:
   name: none
 
 nodes:
-  - hostname: "talos-cp01"
+  - hostname: "talos-cp01.${clusterDNSSuffix}"
     ipAddress: "192.168.112.41"
     installDiskSelector:
-      serial: "talos-cp01-disk0"
+      size: "500GB"
     talosImageURL: factory.talos.dev/installer/22a73b21ea2e27057f17a22b56fdf89e09868979c10d22f10a9b7e9c1e988a60
     controlPlane: true
     networkInterfaces:
@@ -31,16 +31,16 @@ nodes:
         dhcp: false
         addresses:
           - "192.168.112.41/22"
-        mtu: 1500
+        mtu: 9000
         routes:
           - network: 0.0.0.0/0
             gateway: "192.168.115.254"
         vip:
-          ip: "192.168.115.100"
-  - hostname: "talos-cp02"
+          ip: "${clusterEndpointIP}"
+  - hostname: "talos-cp02.${clusterDNSSuffix}"
     ipAddress: "192.168.112.42"
     installDiskSelector:
-      serial: "talos-cp02-disk0"
+      size: "500GB"
     talosImageURL: factory.talos.dev/installer/22a73b21ea2e27057f17a22b56fdf89e09868979c10d22f10a9b7e9c1e988a60
     controlPlane: true
     networkInterfaces:
@@ -48,16 +48,16 @@ nodes:
         dhcp: false
         addresses:
           - "192.168.112.42/22"
-        mtu: 1500
+        mtu: 9000
         routes:
           - network: 0.0.0.0/0
             gateway: "192.168.115.254"
         vip:
-          ip: "192.168.115.100"
-  - hostname: "talos-cp03"
+          ip: "${clusterEndpointIP}"
+  - hostname: "talos-cp03.${clusterDNSSuffix}"
     ipAddress: "192.168.112.43"
     installDiskSelector:
-      serial: "talos-cp03-disk0"
+      size: "500GB"
     talosImageURL: factory.talos.dev/installer/22a73b21ea2e27057f17a22b56fdf89e09868979c10d22f10a9b7e9c1e988a60
     controlPlane: true
     networkInterfaces:
@@ -65,16 +65,16 @@ nodes:
         dhcp: false
         addresses:
           - "192.168.112.43/22"
-        mtu: 1500
+        mtu: 9000
         routes:
           - network: 0.0.0.0/0
             gateway: "192.168.115.254"
         vip:
-          ip: "192.168.115.100"
-  - hostname: "talos-cp04"
+          ip: "${clusterEndpointIP}"
+  - hostname: "talos-cp04.${clusterDNSSuffix}"
     ipAddress: "192.168.112.44"
     installDiskSelector:
-      serial: "talos-cp04-disk0"
+      size: "500GB"
     talosImageURL: factory.talos.dev/installer/22a73b21ea2e27057f17a22b56fdf89e09868979c10d22f10a9b7e9c1e988a60
     controlPlane: true
     networkInterfaces:
@@ -82,29 +82,29 @@ nodes:
         dhcp: false
         addresses:
           - "192.168.112.44/22"
-        mtu: 1500
+        mtu: 9000
         routes:
           - network: 0.0.0.0/0
             gateway: "192.168.115.254"
         vip:
-          ip: "192.168.115.100"
-  - hostname: "talos-cp05"
+          ip: "${clusterEndpointIP}"
+  - hostname: "talos-cp05.${clusterDNSSuffix}"
     ipAddress: "192.168.112.45"
     installDiskSelector:
-      serial: "talos-cp05-disk0"
-    talosImageURL: factory.talos.dev/installer/22a73b21ea2e27057f17a22b56fdf89e09868979c10d22f10a9b7e9c1e988a60
+      size: "500GB"
+    talosImageURL: factory.talos.dev/installer/585a7e76a7c4142558cae08e1c5e7f34e22928f22811bd1d3cb8fa39ce420e8b
     controlPlane: true
     networkInterfaces:
       - interface: eth0
         dhcp: false
         addresses:
           - "192.168.112.45/22"
-        mtu: 1500
+        mtu: 9000
         routes:
           - network: 0.0.0.0/0
             gateway: "192.168.115.254"
         vip:
-          ip: "192.168.115.100"
+          ip: "${clusterEndpointIP}"
 
 patches:
   # Configure containerd
@@ -164,7 +164,8 @@ patches:
       time:
         disabled: false
         servers:
-          - time.cloudflare.com
+          - 192.168.123.150
+          - 192.168.123.151
 
   # Custom sysctl settings
   - |-
@@ -173,6 +174,24 @@ patches:
         fs.inotify.max_queued_events: 65536
         fs.inotify.max_user_watches: 524288
         fs.inotify.max_user_instances: 8192
+        vm.nr_hugepages: 1024
+
+    # Configure nfs mount options
+    - |-
+      machine:
+        files:
+          - op: overwrite
+            path: /etc/nfsmount.conf
+            permissions: 0o644
+            content: |
+              [ NFSMount_Global_Options ]
+              nfsvers=4.2
+              hard=True
+              noatime=True
+              nodiratime=True
+              rsize=131072
+              wsize=131072
+              nconnect=8
 
   # Mount openebs-hostpath in kubelet
   - |-
@@ -193,6 +212,15 @@ patches:
       install:
         extraKernelArgs:
           - net.ifnames=0
+
+    # Configure cluster loopback
+    - |-
+      machine:
+        network:
+          extraHostEntries:
+            - ip: ${clusterEndpointIP}
+              aliases:
+                - ${clusterName}.${clusterDNSSuffix}
 
 
 controlPlane:
