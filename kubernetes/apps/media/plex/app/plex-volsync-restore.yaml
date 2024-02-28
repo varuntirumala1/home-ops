@@ -1,0 +1,26 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/volsync.backube/replicationdestination_v1alpha1.json
+apiVersion: volsync.backube/v1alpha1
+kind: ReplicationDestination
+metadata:
+  name: "plex-config-copy"
+spec:
+  trigger:
+    manual: restore-once
+  restic:
+    repository: "plex-restic-secret"
+    cacheStorageClassName: "local-hostpath"
+    cacheCapacity: "3Gi"
+    storageClassName: "ceph-block"
+    volumeSnapshotClassName: "csi-ceph-blockpool"
+    moverSecurityContext:
+      runAsUser: 568
+      runAsGroup: 568
+      fsGroup: 568
+    accessModes:
+      - "ReadWriteOnce"
+# Restore to a different snap uncomment below
+#    restoreAsOf: 2024-02-10T00:00:00-04:00
+    capacity: "10Gi"
+    destinationPVC: config-plex-0
+    copyMethod: Direct

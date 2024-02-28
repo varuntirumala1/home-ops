@@ -1,0 +1,17 @@
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: "gts-production-tls-ec"
+spec:
+  privateKey:
+    algorithm: ECDSA
+    size: 384
+  secretName: "gts-production-tls-ec"
+  issuerRef:
+    name: gts-production
+    kind: ClusterIssuer
+  commonName: "${SECRET_DOMAIN}"
+  dnsNames:
+    - "${SECRET_DOMAIN}"
+    - "*.${SECRET_DOMAIN}"

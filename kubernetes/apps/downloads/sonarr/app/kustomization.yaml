@@ -1,0 +1,24 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/kustomization
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ./externalsecret.yaml
+  - ./pvc.yaml
+  - ./helmrelease.yaml
+  - ./gatus.yaml
+#  - ./networkpolicy.yaml
+configMapGenerator:
+  - name: sonarr-configmap
+    files:
+      - ./scripts/pushover-notify.sh
+  - name: sonarr-dnsdist
+    files:
+      - ./config/dnsdist.conf
+  - name: sonarr-resolv
+    files:
+      - ./config/resolv.conf
+generatorOptions:
+  disableNameSuffixHash: true
+  annotations:
+    kustomize.toolkit.fluxcd.io/substitute: disabled

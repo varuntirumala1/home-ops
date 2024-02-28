@@ -1,0 +1,203 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/helmrelease-helm-v2beta1.json
+apiVersion: helm.toolkit.fluxcd.io/v2beta2
+kind: HelmRelease
+metadata:
+  name: qbittorrent
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 2.6.0
+      interval: 30m
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  maxHistory: 3
+  install:
+    createNamespace: true
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  uninstall:
+    keepHistory: false
+  values:
+    controllers:
+      main:
+        annotations:
+          configmap.reloader.stakater.com/reload: qbittorrent-scripts
+          secret.reloader.stakater.com/reload: qbittorrent-secret
+        pod:
+          securityContext:
+            fsGroup: ${APP_GID}
+            fsGroupChangePolicy: "OnRootMismatch"
+            supplementalGroups:
+              - 10000
+        containers:
+          main:
+            nameOverride: qbittorrent
+            image:
+              repository: ghcr.io/onedr0p/qbittorrent
+              tag: 4.6.3@sha256:a4ad890e8c4a287c17d12ca22eb1d84a046aba2efbd882bf7d6eb12459f6a70c
+              pullPolicy: IfNotPresent
+            env:
+              UMASK: "022"
+              QBITTORRENT__PORT: &port 8080
+            resources:
+              requests:
+                cpu: 49m
+                memory: 1024Mi
+              limits:
+                memory: 8192Mi
+            securityContext:
+              runAsUser: ${APP_UID}
+              runAsGroup: ${APP_GID}
+              runAsNonRoot: true
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop:
+                  - ALL
+
+          gluetun:
+            image:
+              repository: docker.io/qmcgaw/gluetun
+              tag: latest@sha256:63220ec07e40bdf5fdbfe0a6d39d0468ee25c93bd2b31b0e12005cd230b44b8e
+            securityContext:
+              capabilities:
+                add:
+                  - NET_ADMIN
+              allowPrivilegeEscalation: false
+            env:
+              - name: VPN_INTERFACE
+                value: wg0
+              - name: VPN_ENDPOINT_PORT
+                value: "51820"
+              - name: FIREWALL_INPUT_PORTS
+                value: "8080"
+              - name: FIREWALL_OUTBOUND_SUBNETS
+                # Allow access to k8s subnets
+                value: "10.42.0.0/16,10.43.0.0/16"
+              - name: VPN_PORT_FORWARDING
+                value: "on"
+              - name: WIREGUARD_PRIVATE_KEY
+                valueFrom:
+                  secretKeyRef:
+                    name: qbittorrent-secret
+                    key: WIREGUARD_PRIVATE_KEY
+              - name: WIREGUARD_PUBLIC_KEY
+                valueFrom:
+                  secretKeyRef:
+                    name: qbittorrent-secret
+                    key: WIREGUARD_PUBLIC_KEY
+              - name: WIREGUARD_ADDRESSES
+                valueFrom:
+                  secretKeyRef:
+                    name: qbittorrent-secret
+                    key: WIREGUARD_ADDRESSES
+              - name: VPN_SERVICE_PROVIDER
+                valueFrom:
+                  secretKeyRef:
+                    name: qbittorrent-secret
+                    key: VPN_SERVICE_PROVIDER
+              - name: VPN_TYPE
+                valueFrom:
+                  secretKeyRef:
+                    name: qbittorrent-secret
+                    key: VPN_TYPE
+              - name: VPN_ENDPOINT_IP
+                valueFrom:
+                  secretKeyRef:
+                    name: qbittorrent-secret
+                    key: VPN_ENDPOINT_IP
+              - name: VPN_PORT_FORWARDING_PROVIDER
+                valueFrom:
+                  secretKeyRef:
+                    name: qbittorrent-secret
+                    key: VPN_PORT_FORWARDING_PROVIDER
+
+          port-forward:
+            image:
+              repository: ghcr.io/bjw-s/gluetun-qb-port-sync
+              tag: v0.0.1@sha256:63e510461b5948fddb6277ca7551e9f017e8a1603b8a012c7e83e38b17661164
+            env:
+              GLUETUN_CONTROL_SERVER_HOST: localhost
+              GLUETUN_CONTROL_SERVER_PORT: 8000
+              QBITTORRENT_HOST: localhost
+              QBITTORRENT_WEBUI_PORT: *port
+              CRON_ENABLED: true
+              CRON_SCHEDULE: "*/5 * * * *"
+              LOG_TIMESTAMP: false
+            securityContext:
+              runAsUser: ${APP_UID}
+              runAsGroup: ${APP_GID}
+              runAsNonRoot: true
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: false
+              capabilities:
+                drop:
+                  - ALL
+
+    service:
+      main:
+        ports:
+          http:
+            port: *port
+
+    ingress:
+      main:
+        enabled: true
+        className: "internal"
+        annotations:
+          external-dns.powerdns.arpa/enabled: "true"
+          external-dns.alpha.kubernetes.io/target: ingress.${SECRET_DOMAIN}
+          cert-manager.io/cluster-issuer: gts-production
+          cert-manager.io/private-key-algorithm: ECDSA
+          cert-manager.io/private-key-size: "384"
+          nginx.ingress.kubernetes.io/auth-url: |-
+            http://ak-outpost-authentik-embedded-outpost.security.svc.cluster.local:9000/outpost.goauthentik.io/auth/nginx
+          nginx.ingress.kubernetes.io/auth-signin: |-
+            /outpost.goauthentik.io/start?rd=$escaped_request_uri
+          nginx.ingress.kubernetes.io/auth-response-headers: |-
+            Set-Cookie,X-authentik-username,X-authentik-groups,X-authentik-email,X-authentik-name,X-authentik-uid
+          nginx.ingress.kubernetes.io/auth-snippet: |
+            proxy_set_header X-Forwarded-Host $http_host;
+        hosts:
+          - host: &host "qbittorrent.${SECRET_DOMAIN}"
+            paths:
+              - path: /
+                service:
+                  name: main
+                  port: http
+        tls:
+          - hosts:
+              - *host
+            secretName: qbittorrent-cert
+    persistence:
+      config:
+        enabled: true
+        existingClaim: qbittorrent-config
+        advancedMounts:
+          main:
+            main:
+              - path: /config
+      scripts:
+        type: configMap
+        name: qbittorrent-scripts
+        defaultMode: 0775
+        advancedMounts:
+          main:
+            main:
+              - path: /scripts
+                readOnly: true
+      media:
+        type: nfs
+        server: 192.168.120.12
+        path: /mnt/flashstor/media
+        globalMounts:
+          - path: /media

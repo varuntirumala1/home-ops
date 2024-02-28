@@ -1,0 +1,35 @@
+---
+apiVersion: awx.ansible.com/v1beta1
+kind: AWX
+metadata:
+  name: awx
+
+spec:
+  #auto_upgrade: true
+  task_privileged: true
+  web_replicas: 2
+  task_replicas: 2
+  # redis_image: docker.io/redis
+  # redis_image_version: alpine
+  # image: quay.io/ansible/awx
+  # image_version: 23.7.0
+  web_resource_requirements:
+    requests:
+      cpu: 100m
+      memory: 2Gi
+    limits:
+      memory: 4Gi
+  task_resource_requirements:
+    requests:
+      cpu: 100m
+      memory: 1Gi
+    limits:
+      memory: 2Gi
+  ee_resource_requirements:
+    requests:
+      cpu: 100m
+      memory: 100Mi
+    limits:
+      memory: 2Gi
+  secret_key_secret: custom-awx-secret-key
+  postgres_configuration_secret: awx-external-db-secret

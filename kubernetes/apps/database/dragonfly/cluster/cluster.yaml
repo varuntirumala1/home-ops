@@ -1,0 +1,23 @@
+---
+apiVersion: dragonflydb.io/v1alpha1
+kind: Dragonfly
+metadata:
+  labels:
+    app.kubernetes.io/name: dragonfly
+    app.kubernetes.io/instance: dragonfly
+    app.kubernetes.io/part-of: dragonfly-operator
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/created-by: dragonfly-operator
+  name: dragonfly
+spec:
+  image: ghcr.io/dragonflydb/dragonfly:v1.14.5@sha256:f0994b955ccac57068eaf512064ce9e0e62e5a56001d78378417977b7d008895
+  replicas: 3
+  args:
+    - '--proactor_threads=4'
+#    - '--hz=1'
+  resources:
+    requests:
+      cpu: 20m
+      memory: 2048Mi
+    limits:
+      memory: 4096Mi

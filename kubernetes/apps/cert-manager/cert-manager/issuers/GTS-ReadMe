@@ -1,0 +1,28 @@
+# # Follow the tutorial to setup the account and request a EAB secret
+
+# # https://cloud.google.com/certificate-manager/docs/public-ca-tutorial
+
+# gcloud init
+# gcloud projects create <PROJECT_ID>
+# gcloud config set project <PROJECT_ID>
+
+# gcloud projects add-iam-policy-binding <PROJECT_ID> \
+#   --member=user:<username-replace> \
+#   --role=roles/publicca.externalAccountKeyCreator
+
+# gcloud services enable publicca.googleapis.com
+
+# gcloud publicca external-account-keys create
+
+# # The EAB KID and EAB Secret are generated at this point by following the steps or tutorial link above.
+# # The generated keys are valid for 7days only so a ACME client needs to registered with those credentials within 7days.
+# # If not credentials will have to be generated.
+
+# # Follow steps below to properly encode the HMAC secret encoded into Base64 to add into the secret file.
+# # Reference link
+# # https://www.uffizzi.com/blog/ditching-zerossl-for-google-public-certificate-authority-for-ssl-certificates-via-cert-manager-and-acme-protocol
+
+# echo -n '<Paste-HMAC-Secret-Here>' | base64 --wrap=0
+
+# # Modify the secret.sops.yaml file with EABKID and encoded Secret from above.
+# # Add EABKID to flux cluster secret

@@ -1,0 +1,64 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: autobrr-networkpolicy
+  namespace: downloads
+spec:
+  endpointSelector:
+    matchLabels:
+      name: autobrr
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            name: ingress-nginx
+            instance: nginx-internal
+            io.kubernetes.pod.namespace: network
+      toPorts:
+        - ports:
+            - port: "80"
+              protocol: TCP
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: kube-system
+            k8s-app: kube-dns
+      toPorts:
+        - ports:
+            - port: "53"
+              protocol: UDP
+          rules:
+            dns:
+              - matchPattern: "*"
+    - toEndpoints:
+        - matchLabels:
+            cnpg.io/cluster: postgres16
+            cnpg.io/instancerole: primary
+            io.kubernetes.pod.namespace: database
+      toPorts:
+        - ports:
+            - port: "5432"
+              protocol: TCP
+    - toCIDRSet:
+        - cidr: 0.0.0.0/0
+          except:
+            - 10.0.0.0/8
+            - 172.16.0.0/12
+            - 192.168.0.0/16
+      toPorts:
+        - ports:
+            - port: "51820"
+              protocol: UDP
+    - toEndpoints:
+        - matchLabels:
+            name: radarr
+      toPorts:
+        - ports:
+            - port: "80"
+              protocol: TCP
+    - toEndpoints:
+        - matchLabels:
+            name: sonarr
+      toPorts:
+        - ports:
+            - port: "80"
+              protocol: TCP

@@ -1,0 +1,19 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/kustomization
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: downloads
+resources:
+  - ./externalsecret.yaml
+  - ./helmrelease.yaml
+  - ./gatus.yaml
+#  - ./networkpolicy.yaml
+configMapGenerator:
+  - name: prowlarr-dnsdist
+    files:
+      - ./config/dnsdist.conf
+  - name: prowlarr-resolv
+    files:
+      - ./config/resolv.conf
+generatorOptions:
+  disableNameSuffixHash: true

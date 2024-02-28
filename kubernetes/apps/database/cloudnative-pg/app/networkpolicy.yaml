@@ -1,0 +1,113 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: postgres-networkpolicy
+  namespace: database
+spec:
+  endpointSelector:
+    matchLabels:
+      cnpg.io/cluster: postgres16
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            app: radarr
+            io.kubernetes.pod.namespace: downloads
+      toPorts:
+        - ports:
+            - port: "5432"
+              protocol: TCP
+    - fromEndpoints:
+        - matchLabels:
+            app: sonarr
+            io.kubernetes.pod.namespace: downloads
+      toPorts:
+        - ports:
+            - port: "5432"
+              protocol: TCP
+    - fromEndpoints:
+        - matchLabels:
+            app: prowlarr
+            io.kubernetes.pod.namespace: downloads
+      toPorts:
+        - ports:
+            - port: "5432"
+              protocol: TCP
+    - fromEndpoints:
+        - matchLabels:
+            name: autobrr
+            io.kubernetes.pod.namespace: downloads
+      toPorts:
+        - ports:
+            - port: "5432"
+              protocol: TCP
+    - fromEndpoints:
+        - matchLabels:
+            name: atuin
+            io.kubernetes.pod.namespace: default
+      toPorts:
+        - ports:
+            - port: "5432"
+              protocol: TCP
+    - fromEndpoints:
+        - matchLabels:
+            name: grafana
+            io.kubernetes.pod.namespace: observability
+      toPorts:
+        - ports:
+            - port: "5432"
+              protocol: TCP
+    - fromEndpoints:
+        - matchLabels:
+            name: authentik
+            io.kubernetes.pod.namespace: security
+      toPorts:
+        - ports:
+            - port: "5432"
+              protocol: TCP
+    - fromEndpoints:
+        - matchLabels:
+            name: prometheus
+            io.kubernetes.pod.namespace: observability
+      toPorts:
+        - ports:
+            - port: "9187"
+              protocol: TCP
+    - fromEndpoints:
+        - matchLabels:
+            cnpg.io/cluster: postgres16
+            cnpg.io/instancerole: replica
+      toPorts:
+        - ports:
+            - port: "5432"
+              protocol: TCP
+    - fromCIDRSet:
+        - cidr: 192.168.254.12/32
+      toPorts:
+        - ports:
+            - port: "5432"
+              protocol: TCP
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            cnpg.io/cluster: postgres16
+      toPorts:
+        - ports:
+            - port: "5432"
+              protocol: TCP
+    - toCIDRSet:
+        - cidr: 192.168.120.12/32
+      toPorts:
+        - ports:
+            - port: "9000"
+              protocol: TCP
+    - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: kube-system
+            k8s-app: kube-dns
+      toPorts:
+        - ports:
+            - port: "53"
+              protocol: UDP
+          rules:
+            dns:
+              - matchPattern: "*"

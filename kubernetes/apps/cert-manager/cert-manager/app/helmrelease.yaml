@@ -1,0 +1,66 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta2
+kind: HelmRelease
+metadata:
+  name: cert-manager
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: cert-manager
+      version: v1.14.3
+      sourceRef:
+        kind: HelmRepository
+        name: jetstack
+        namespace: flux-system
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  uninstall:
+    keepHistory: false
+  values:
+    installCRDs: true
+    dns01RecursiveNameservers: 1.1.1.1:53,9.9.9.9:53
+    dns01RecursiveNameserversOnly: true
+    podDnsPolicy: None
+    podDnsConfig:
+      nameservers:
+        - "1.1.1.1"
+        - "9.9.9.9"
+    prometheus:
+      enabled: true
+      servicemonitor:
+        enabled: true
+    image:
+      repository: quay.io/jetstack/cert-manager-controller
+      digest: sha256:94c24f76822cbf523eedb36c4c4aaa1eb8fffad31841a82946a175c74e3a9673
+      pullPolicy: IfNotPresent
+
+    webhook:
+      image:
+        repository: quay.io/jetstack/cert-manager-webhook
+        digest: sha256:8c2974322be244119eff2112ce1ea935dcd15bc9cc50b42c6796f8d66d09f9e3
+        pullPolicy: IfNotPresent
+
+    cainjector:
+      image:
+        repository: quay.io/jetstack/cert-manager-cainjector
+        digest: sha256:20878790620de378a206d74f23e472f99b33fa79f07f744d1de22807ede9c9ce
+        pullPolicy: IfNotPresent
+
+    acmesolver:
+      image:
+        repository: quay.io/jetstack/cert-manager-acmesolver
+        digest: sha256:958f9455bfa57dc7b289fc0d32f01d952b8b028a3dbe54300fb4dc633e109fa2
+        pullPolicy: IfNotPresent
+
+    startupapicheck:
+      image:
+        repository: quay.io/jetstack/cert-manager-startupapicheck
+        digest: sha256:8346ee523d0818fef229a555169e5be32e66d0a9bd620b7b134d97f7e5897ba0
+        pullPolicy: IfNotPresent
+
