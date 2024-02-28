@@ -45,8 +45,8 @@ Dev Container is used to run the environment that has all the necessary tools.
 1. Create talos secrets
 
     ```sh
-    task talos:gensecret
-    task talos:genconfig
+    task talos:bootstrap-gensecret
+    task talos:bootstrap-genconfig
     ```
 
 2. Deploy talos VM with the configs generated from step 1.
@@ -59,14 +59,14 @@ Dev Container is used to run the environment that has all the necessary tools.
 3. Boostrap talos and get kubeconfig
 
     ```sh
-    task talos:bootstrap
-    task talos:kubeconfig node=$master_node_ip_address
+    task talos:bootstrap-install
+    task talos:fetch-kubeconfig
     ```
 
 4. Install cilium and kubelet-csr-approver into the cluster
 
     ```sh
-    task talos:apply-extras
+    task talos:bootstrap-apps
     ```
 5. Apply GPU patch to the GPU node/s.
     ```sh
@@ -78,7 +78,7 @@ Dev Container is used to run the environment that has all the necessary tools.
     ```sh
     talosctl -n <node-ip> upgrade --image factory.talos.dev/installer/<schematic-id>:<talos-ver>
     ```
-🩹**Note:** I applied the upgrade to GPU node/s with GPU specific schematic ID and also to regular nodes with regular schematic ID with just intel-ucode.
+🩹**Note:** I applied the upgrade to GPU node/s with GPU specific schematic ID and also to regular nodes with regular schematic ID with just intel-ucode and iscsi extension.
 
 7. Verify NVIDIA kernel modules and extensions are loaded
     ```sh
