@@ -44,7 +44,6 @@ mkdir -p /home/vscode/.config/fish/{completions,conf.d}
 for tool in cilium flux helm helmfile k9s kubectl kustomize talhelper talosctl; do
     $tool completion fish > /home/vscode/.config/fish/completions/$tool.fish
 done
-
 gh completion --shell fish > /home/vscode/.config/fish/completions/gh.fish
 stern --completion fish > /home/vscode/.config/fish/completions/stern.fish
 yq shell-completion fish > /home/vscode/.config/fish/completions/yq.fish

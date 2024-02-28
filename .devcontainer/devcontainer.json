@@ -1,7 +1,7 @@
 {
   "$schema": "https://raw.githubusercontent.com/devcontainers/spec/main/schemas/devContainer.schema.json",
   "name": "Home Kubernetes Cluster",
-  "image": "ghcr.io/onedr0p/cluster-template/devcontainer:latest",
+  "image": "ghcr.io/onedr0p/cluster-template/devcontainer:base",
   "postCreateCommand": {
     "setup": "bash ${containerWorkspaceFolder}/.devcontainer/postCreateCommand.sh"
   },

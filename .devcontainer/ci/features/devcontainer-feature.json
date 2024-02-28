@@ -1,6 +1,6 @@
 {
-  "name": "Home Ops (Tools)",
-  "id": "home-kubernetes",
+  "name": "Flux Cluster Template (Tools)",
+  "id": "cluster-template",
   "version": "1.0.0",
   "description": "Install Tools"
 }
