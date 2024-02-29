@@ -5,4 +5,9 @@ kind: Kustomization
 resources:
   - ./externalsecret.yaml
   - ./helmrelease.yaml
-  # - ./dashboard
+configMapGenerator:
+  - name: vector-aggregator-configmap
+    files:
+      - vector.yaml=./config/vector.yaml
+generatorOptions:
+  disableNameSuffixHash: true
