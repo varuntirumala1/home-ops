@@ -10,3 +10,4 @@ spec:
 
 ####Apply using kubectl apply -f on-demandbackup.yaml
 ####Check the status of the backup using kubectl describe backup ondemand-backup -n database
+####Delete once done using kubectl delete -f on-demandbackup.yaml
