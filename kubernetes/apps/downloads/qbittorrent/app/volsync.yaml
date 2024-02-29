@@ -37,7 +37,7 @@ spec:
     pruneIntervalDays: 7
     repository: qbittorrent-restic-secret
     cacheCapacity: 1Gi
-    cacheStorageClassName: local-hostpath
+    cacheStorageClassName: openebs-hostpath
     volumeSnapshotClassName: csi-ceph-filesystem
     storageClassName: ceph-filesystem
     moverSecurityContext:

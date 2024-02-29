@@ -9,7 +9,7 @@ spec:
     manual: restore-once
   restic:
     repository: "recyclarr-restic-secret"
-    cacheStorageClassName: "local-hostpath"
+    cacheStorageClassName: "openebs-hostpath"
     cacheCapacity: "1Gi"
     storageClassName: "ceph-block"
     volumeSnapshotClassName: "csi-ceph-blockpool"

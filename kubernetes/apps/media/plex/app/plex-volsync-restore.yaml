@@ -9,7 +9,7 @@ spec:
     manual: restore-once
   restic:
     repository: "plex-restic-secret"
-    cacheStorageClassName: "local-hostpath"
+    cacheStorageClassName: "openebs-hostpath"
     cacheCapacity: "3Gi"
     storageClassName: "ceph-block"
     volumeSnapshotClassName: "csi-ceph-blockpool"
