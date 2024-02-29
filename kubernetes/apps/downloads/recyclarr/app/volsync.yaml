@@ -21,27 +21,27 @@ spec:
   dataFrom:
     - extract:
         key: volsync-restic-template
-# ---
-# apiVersion: volsync.backube/v1alpha1
-# kind: ReplicationSource
-# metadata:
-#   name: recyclarr
-# spec:
-#   sourcePVC: config-recyclarr-0
-#   trigger:
-#     schedule: "0 */12 * * *"
-#   restic:
-#     copyMethod: Snapshot
-#     pruneIntervalDays: 14
-#     repository: recyclarr-restic-secret
-#     moverSecurityContext:
-#       runAsUser: 568
-#       runAsGroup: 568
-#       fsGroup: 568
-#     accessModes:
-#       - "ReadWriteOnce"
-#     retain:
-#       daily: 14
-#     volumeSnapshotClassName: "truenas-iscsi"
-#     storageClassName: "truenas-iscsi"
-#     cacheStorageClassName: "openebs-hostpath"
+---
+apiVersion: volsync.backube/v1alpha1
+kind: ReplicationSource
+metadata:
+  name: recyclarr
+spec:
+  sourcePVC: config-recyclarr-0
+  trigger:
+    schedule: "0 */12 * * *"
+  restic:
+    copyMethod: Snapshot
+    pruneIntervalDays: 14
+    repository: recyclarr-restic-secret
+    moverSecurityContext:
+      runAsUser: 568
+      runAsGroup: 568
+      fsGroup: 568
+    accessModes:
+      - "ReadWriteOnce"
+    retain:
+      daily: 14
+    volumeSnapshotClassName: "truenas-iscsi"
+    storageClassName: "truenas-iscsi"
+    cacheStorageClassName: "openebs-hostpath"
