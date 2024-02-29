@@ -74,7 +74,7 @@ Dev Container is used to run the environment that has all the necessary tools.
     talosctl -n <node-ip> patch mc --patch @gpu-patch.yaml
     ```
 
-6. Ensure/upgrade talos to the correct schematic generated from [talos](https://factory.talos.dev); GPU node has a different schematic ID compared to regular node due to added modules/extensions siderolabs/nonfree-kmod-nvidia and siderolabs/nvidia-container-toolkit.
+6. Upgrade talos to the correct schematic generated from [talos](https://factory.talos.dev) since the OVA doesn't include any required extensions for this repo; GPU node has a different schematic ID compared to regular node due to added modules/extensions siderolabs/nonfree-kmod-nvidia and siderolabs/nvidia-container-toolkit.
     ```sh
     talosctl -n <node-ip> upgrade --image factory.talos.dev/installer/<schematic-id>:<talos-ver>
     ```
