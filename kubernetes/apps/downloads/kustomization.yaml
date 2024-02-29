@@ -8,8 +8,8 @@ resources:
   # - ./prowlarr/ks.yaml
   # - ./radarr/ks.yaml
   # - ./sonarr/ks.yaml
-  # - ./qbittorrent/ks.yaml
-  # - ./sabnzbd/ks.yaml
+  - ./qbittorrent/ks.yaml
+  - ./sabnzbd/ks.yaml
   # - ./autobrr/ks.yaml
-  # - ./recyclarr/ks.yaml
+  - ./recyclarr/ks.yaml
   # - ./cross-seed/ks.yaml

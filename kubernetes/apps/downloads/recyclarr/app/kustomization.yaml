@@ -4,9 +4,9 @@ kind: Kustomization
 resources:
   - ./externalsecret.yaml
   - ./pvc.yaml
-  - ./helmrelease.yaml
+#  - ./helmrelease.yaml
   - ./volsync.yaml
-#  - ./recyclarr-volsync-restore.yaml
+  - ./recyclarr-volsync-restore.yaml
 configMapGenerator:
   - name: recyclarr-configmap
     files:
