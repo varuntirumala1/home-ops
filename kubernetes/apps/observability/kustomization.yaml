@@ -11,3 +11,4 @@ resources:
   - ./loki/ks.yaml
   - ./gatus/ks.yaml
   - ./vector/ks.yaml
+  - ./node-exporter/ks.yaml
