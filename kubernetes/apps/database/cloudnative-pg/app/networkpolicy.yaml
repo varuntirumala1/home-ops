@@ -95,7 +95,7 @@ spec:
             - port: "5432"
               protocol: TCP
     - toCIDRSet:
-        - cidr: 192.168.120.12/32
+        - cidr: 192.168.112.5/32
       toPorts:
         - ports:
             - port: "9000"

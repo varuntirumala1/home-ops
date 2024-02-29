@@ -99,7 +99,7 @@ spec:
         existingClaim: config-plex-0
       plex-media:
         type: nfs
-        server: 192.168.120.12
+        server: 192.168.112.5
         path: /mnt/flashstor/media
         globalMounts:
           - path: /plex-media
