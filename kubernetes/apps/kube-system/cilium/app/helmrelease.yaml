@@ -28,7 +28,7 @@ spec:
       dashboards:
         enabled: true
         label: grafana_dashboard
-        namespace: monitoring
+        namespace: observability
         labelValue: "1"
         annotations: {}
 
