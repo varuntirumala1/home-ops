@@ -22,30 +22,30 @@ spec:
   dataFrom:
     - extract:
         key: volsync-restic-template
-# ---
-# # yaml-language-server: $schema=https://kubernetes-schemas.devbu.io/volsync.backube/replicationsource_v1alpha1.json
-# apiVersion: volsync.backube/v1alpha1
-# kind: ReplicationSource
-# metadata:
-#   name: sabnzbd
-# spec:
-#   sourcePVC: sabnzbd-config
-#   trigger:
-#     schedule: "0 7 * * *"
-#   restic:
-#     copyMethod: Snapshot
-#     pruneIntervalDays: 7
-#     repository: sabnzbd-restic-secret
-#     cacheCapacity: 1Gi
-#     cacheStorageClassName: openebs-hostpath
-#     volumeSnapshotClassName: truenas-iscsi
-#     storageClassName: truenas-iscsi
-#     moverSecurityContext:
-#       runAsUser: 568
-#       runAsGroup: 568
-#       fsGroup: 568
-#     accessModes:
-#       - "ReadWriteOnce"
-#     retain:
-#       daily: 7
-#       within: 3d
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.devbu.io/volsync.backube/replicationsource_v1alpha1.json
+apiVersion: volsync.backube/v1alpha1
+kind: ReplicationSource
+metadata:
+  name: sabnzbd
+spec:
+  sourcePVC: sabnzbd-config
+  trigger:
+    schedule: "0 7 * * *"
+  restic:
+    copyMethod: Snapshot
+    pruneIntervalDays: 7
+    repository: sabnzbd-restic-secret
+    cacheCapacity: 1Gi
+    cacheStorageClassName: openebs-hostpath
+    volumeSnapshotClassName: truenas-iscsi
+    storageClassName: truenas-iscsi
+    moverSecurityContext:
+      runAsUser: 568
+      runAsGroup: 568
+      fsGroup: 568
+    accessModes:
+      - "ReadWriteOnce"
+    retain:
+      daily: 7
+      within: 3d
