@@ -1,0 +1,12 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Backup
+metadata:
+  name: ondemand-backup
+spec:
+  cluster:
+    name: postgres16
+
+
+
+####Apply using kubectl apply -f on-demandbackup.yaml
+####Check the status of the backup using kubectl describe backup ondemand-backup -n database
