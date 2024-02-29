@@ -37,12 +37,12 @@ spec:
     repository: plex-restic-secret
     moverSecurityContext:
       runAsUser: 568
-      runAsGroup: 100
-      fsGroup: 100
+      runAsGroup: 568
+      fsGroup: 568
     retain:
       daily: 14
-    volumeSnapshotClassName: csi-ceph-blockpool
-    storageClassName: ceph-block
-    cacheStorageClassName: openebs-hostpath
+    volumeSnapshotClassName: "truenas-iscsi"
+    storageClassName: "truenas-iscsi"
+    cacheStorageClassName: "openebs-hostpath"
     accessModes:
       - "ReadWriteOnce"

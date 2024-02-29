@@ -11,8 +11,8 @@ spec:
     repository: "plex-restic-secret"
     cacheStorageClassName: "openebs-hostpath"
     cacheCapacity: "3Gi"
-    storageClassName: "ceph-block"
-    volumeSnapshotClassName: "csi-ceph-blockpool"
+    storageClassName: "truenas-iscsi"
+    volumeSnapshotClassName: "truenas-iscsi"
     moverSecurityContext:
       runAsUser: 568
       runAsGroup: 568
@@ -21,6 +21,6 @@ spec:
       - "ReadWriteOnce"
 # Restore to a different snap uncomment below
 #    restoreAsOf: 2024-02-10T00:00:00-04:00
-    capacity: "10Gi"
+    capacity: "100Gi"
     destinationPVC: config-plex-0
     copyMethod: Direct

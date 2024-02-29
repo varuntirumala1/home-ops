@@ -4,8 +4,8 @@ kind: PersistentVolumeClaim
 metadata:
   name: sabnzbd-config
 spec:
-  accessModes: ["ReadWriteMany"]
+  accessModes: ["ReadWriteOnce"]
   resources:
     requests:
       storage: 2Gi
-  storageClassName: ceph-filesystem
+  storageClassName: truenas-iscsi

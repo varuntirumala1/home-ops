@@ -11,8 +11,8 @@ spec:
     repository: "recyclarr-restic-secret"
     cacheStorageClassName: "openebs-hostpath"
     cacheCapacity: "1Gi"
-    storageClassName: "ceph-block"
-    volumeSnapshotClassName: "csi-ceph-blockpool"
+    storageClassName: "truenas-iscsi"
+    volumeSnapshotClassName: "truenas-iscsi"
     moverSecurityContext:
       runAsUser: 568
       runAsGroup: 568

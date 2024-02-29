@@ -8,4 +8,4 @@ spec:
   resources:
     requests:
       storage: 8Gi
-  storageClassName: ceph-filesystem
+  storageClassName: truenas-nfs
