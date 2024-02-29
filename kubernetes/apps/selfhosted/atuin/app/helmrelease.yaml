@@ -78,10 +78,6 @@ spec:
           cert-manager.io/cluster-issuer: gts-production
           cert-manager.io/private-key-algorithm: ECDSA
           cert-manager.io/private-key-size: "384"
-          nginx.ingress.kubernetes.io/affinity: cookie
-          nginx.ingress.kubernetes.io/affinity-node: persistent
-          nginx.ingress.kubernetes.io/proxy-buffer-size: "16k"
-          nginx.ingress.kubernetes.io/proxy-buffers-number: "4"
         hosts:
           - host: &host "sh.${SECRET_DOMAIN}"
             paths:

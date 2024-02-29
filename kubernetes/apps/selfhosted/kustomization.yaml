@@ -6,8 +6,8 @@ resources:
   # Pre Flux-Kustomizations
   - ./namespace.yaml
   # Flux-Kustomizations
-#   - ./atuin/ks.yaml
-# #  - ./awx/ks.yaml #DB not ready
-#   - ./linkding/ks.yaml
-#   - ./smtp-relay/ks.yaml
-#   - ./wallabag/ks.yaml
+  - ./atuin/ks.yaml
+#  - ./awx/ks.yaml #DB not ready
+  - ./linkding/ks.yaml
+  - ./smtp-relay/ks.yaml
+  - ./wallabag/ks.yaml
