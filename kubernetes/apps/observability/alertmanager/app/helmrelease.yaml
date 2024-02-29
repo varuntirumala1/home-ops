@@ -55,7 +55,7 @@ spec:
     ingress:
       enabled: true
       pathType: Prefix
-      ingressClassName: internal
+      ingressClassName: "internal"
       annotations:
         cert-manager.io/cluster-issuer: gts-production
         cert-manager.io/private-key-algorithm: ECDSA
