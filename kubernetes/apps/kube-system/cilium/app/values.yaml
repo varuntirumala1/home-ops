@@ -62,29 +62,7 @@ containerRuntime:
   integration: containerd
 
 hubble:
-  enabled: true
-  serviceMonitor:
-    enabled: false
-
-  metrics:
-    enabled:
-      - dns:query;ignoreAAAA
-      - drop
-      - tcp
-      - flow
-      - port-distribution
-      - icmp
-      - http
-
-  relay:
-    enabled: true
-    rollOutPods: true
-
-  ui:
-    enabled: true
-    ingress:
-      enabled: false
-    rollOutPods: true
+  enabled: false
 
 securityContext:
   capabilities:
