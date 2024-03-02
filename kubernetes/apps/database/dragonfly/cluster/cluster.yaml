@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/created-by: dragonfly-operator
   name: dragonfly
 spec:
-  image: ghcr.io/dragonflydb/dragonfly:v1.14.5@sha256:f0994b955ccac57068eaf512064ce9e0e62e5a56001d78378417977b7d008895
+  image: ghcr.io/dragonflydb/dragonfly:v1.14.6@sha256:10b3e4eb7adebecc04a5e10bacef6a478911ed4bda670e3af64300054aaa453f
   replicas: 3
   args:
     - '--proactor_threads=2'
