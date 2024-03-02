@@ -20,7 +20,7 @@ resources:
   - ./one-password.yaml
   - ./awx.yaml
   - ./nvidia.yaml
-  - ./rook-ceph.yaml
+#  - ./rook-ceph.yaml
   - ./piraeus.yaml
   - ./descheduler.yaml
   - ./backube.yaml

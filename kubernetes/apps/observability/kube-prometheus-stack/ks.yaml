@@ -19,7 +19,7 @@ spec:
   wait: true
   dependsOn:
     - name: alertmanager
-    - name: rook-ceph-cluster
+    - name: democratic-csi-iscsi
     - name: external-secrets-stores
 ---
 # yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/kustomization-kustomize-v1.json

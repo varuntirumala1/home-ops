@@ -11,7 +11,7 @@ spec:
     labels:
       app.kubernetes.io/name: *app
   dependsOn:
-    - name: rook-ceph-cluster
+    - name: democratic-csi-iscsi
     - name: volsync
     - name: nvidia-device-plugin
   path: "./kubernetes/apps/media/plex/app"
