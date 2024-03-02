@@ -41,14 +41,14 @@ spec:
               path: /var/lib/grafana/dashboards/default
             orgId: 1
             type: file
-          - name: ceph
-            orgId: 1
-            folder: Ceph
-            type: file
-            disableDeletion: false
-            editable: true
-            options:
-              path: /var/lib/grafana/dashboards/ceph
+          # - name: ceph
+          #   orgId: 1
+          #   folder: Ceph
+          #   type: file
+          #   disableDeletion: false
+          #   editable: true
+          #   options:
+          #     path: /var/lib/grafana/dashboards/ceph
           - name: flux
             orgId: 1
             folder: Flux
@@ -81,14 +81,14 @@ spec:
             editable: true
             options:
               path: /var/lib/grafana/dashboards/thanos
-          - name: unpoller
-            disableDeletion: false
-            editable: true
-            folder: "UniFi Poller"
-            options:
-              path: /var/lib/grafana/dashboards/unpoller
-            orgId: 1
-            type: file
+          # - name: unpoller
+          #   disableDeletion: false
+          #   editable: true
+          #   folder: "UniFi Poller"
+          #   options:
+          #     path: /var/lib/grafana/dashboards/unpoller
+          #   orgId: 1
+          #   type: file
 
     dashboards:
       default:
@@ -156,22 +156,22 @@ spec:
           revision: 4
           datasource: Prometheus
 
-      ceph:
-        ceph-cluster:
-          # renovate: dashboardName="Ceph Cluster"
-          gnetId: 2842
-          revision: 17
-          datasource: Prometheus
-        ceph-osd:
-          # renovate: dashboardName="Ceph - OSD (Single)"
-          gnetId: 5336
-          revision: 9
-          datasource: Prometheus
-        ceph-pools:
-          # renovate: dashboardName="Ceph - Pools"
-          gnetId: 5342
-          revision: 9
-          datasource: Prometheus
+      # ceph:
+      #   ceph-cluster:
+      #     # renovate: dashboardName="Ceph Cluster"
+      #     gnetId: 2842
+      #     revision: 17
+      #     datasource: Prometheus
+      #   ceph-osd:
+      #     # renovate: dashboardName="Ceph - OSD (Single)"
+      #     gnetId: 5336
+      #     revision: 9
+      #     datasource: Prometheus
+      #   ceph-pools:
+      #     # renovate: dashboardName="Ceph - Pools"
+      #     gnetId: 5342
+      #     revision: 9
+      #     datasource: Prometheus
 
       flux:
         flux-cluster:
@@ -260,7 +260,8 @@ spec:
           - access: proxy
             name: Prometheus
             type: prometheus
-            url: http://thanos-query.observability:9090
+            uid: prometheus
+            url: http://thanos-query-frontend.observability.svc.cluster.local:9090
             isDefault: true
             jsonData:
               prometheusType: Thanos
@@ -268,9 +269,10 @@ spec:
           - access: proxy
             name: Loki
             type: loki
+            uid: loki
             url: http://loki-gateway.observability.svc.cluster.local:80
           - name: Alertmanager
-            type: alertmanager
+            uid: alertmanager
             access: proxy
             url: http://alertmanager.observability.svc.cluster.local:9093
             jsonData:
@@ -281,6 +283,7 @@ spec:
           - name: Prometheus
             orgId: 1
           - name: Loki
+            orgId: 1
 
     env:
       GF_ANALYTICS_CHECK_FOR_UPDATES: false
