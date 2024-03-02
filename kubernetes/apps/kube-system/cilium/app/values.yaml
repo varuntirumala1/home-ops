@@ -20,8 +20,10 @@ k8sServicePort: 7445
 
 rollOutCiliumPods: true
 localRedirectPolicy: true
+
 enableIPv6BIGTCP: true
 enableIPv4BIGTCP: true
+
 kubeProxyReplacement: strict
 kubeProxyReplacementHealthzBindAddr: 0.0.0.0:10256
 
