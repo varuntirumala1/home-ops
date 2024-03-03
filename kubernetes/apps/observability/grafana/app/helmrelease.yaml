@@ -261,7 +261,7 @@ spec:
             type: prometheus
             uid: prometheus
             access: proxy
-            url: http://thanos-query-frontend.observability.svc.cluster.local:9090
+            url: http://thanos-query.observability.svc.cluster.local:9090/
             isDefault: true
             jsonData:
               prometheusType: Thanos
