@@ -12,4 +12,4 @@ resources:
   - ./sabnzbd/ks.yaml
   - ./autobrr/ks.yaml
   - ./recyclarr/ks.yaml
-#  - ./cross-seed/ks.yaml
+  - ./cross-seed/ks.yaml
