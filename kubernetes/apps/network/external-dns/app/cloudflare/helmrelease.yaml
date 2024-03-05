@@ -56,7 +56,7 @@ spec:
               - --source=crd
               - --source=ingress
               - --txt-owner-id=default
-              - --txt-prefix=k3s.
+              - --txt-prefix=k8s.
             probes:
               liveness: &probes
                 enabled: true
