@@ -1,10 +1,11 @@
 # For dashboard sign in token:
-# kubectl -n observability get secret kubernetes-dashboard -o jsonpath='{.data.token}' | base64 -d
+# kubectl -n system get secret kubernetes-dashboard -o jsonpath='{.data.token}' | base64 -d
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: kubernetes-dashboard
+  namespace: onservability
   labels:
     app.kubernetes.io/managed-by: Helm
   annotations:
@@ -18,6 +19,7 @@ kind: Secret
 type: kubernetes.io/service-account-token
 metadata:
   name: kubernetes-dashboard
+  namespace: observability
   labels:
     app.kubernetes.io/managed-by: Helm
   annotations:
@@ -28,7 +30,7 @@ metadata:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: system:kubernetes-dashboard
+  name: observability:kubernetes-dashboard
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
