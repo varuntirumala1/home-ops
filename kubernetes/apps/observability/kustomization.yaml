@@ -6,7 +6,7 @@ resources:
   - ./alertmanager/ks.yaml
   - ./grafana/ks.yaml
   - ./kube-prometheus-stack/ks.yaml
-  - ./kubernetes-dashboard/ks.yaml
+#  - ./kubernetes-dashboard/ks.yaml
   - ./thanos/ks.yaml
   - ./loki/ks.yaml
   - ./gatus/ks.yaml
