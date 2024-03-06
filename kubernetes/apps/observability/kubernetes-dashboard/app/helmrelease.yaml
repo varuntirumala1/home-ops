@@ -53,7 +53,7 @@ spec:
         nginx.ingress.kubernetes.io/auth-snippet: |
           proxy_set_header X-Forwarded-Host $http_host;
       hosts:
-        - &host "kubernetes.${SECRET_DOMAIN}"
+        - &host kubernetes.${SECRET_DOMAIN}
       tls:
         - hosts:
             - *host
