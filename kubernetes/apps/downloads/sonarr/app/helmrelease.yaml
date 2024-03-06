@@ -203,12 +203,3 @@ spec:
               - path: /etc/resolv.conf
                 subPath: resolv.conf
                 readOnly: true
-      gluetun-data:
-        type: emptyDir
-        advancedMounts:
-          main:
-            gluetun:
-              - path: /tmp/gluetun
-            port-forward:
-              - path: /tmp/gluetun
-                readOnly: true
