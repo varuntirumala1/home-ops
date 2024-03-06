@@ -24,6 +24,12 @@ spec:
   uninstall:
     keepHistory: false
   values:
+    nginx:
+      enabled: false
+    cert-manager:
+      enabled: false
+    metrics-server:
+      enabled: false
     extraArgs:
       - --enable-insecure-login
       - --enable-skip-login
@@ -55,3 +61,5 @@ spec:
           secretName: kubernetes-dashboard-tls
     metricsScraper:
       enabled: true
+    serviceMonitor:
+      enabled: false
