@@ -31,11 +31,6 @@ spec:
         enabled: false
       metrics-server:
         enabled: false
-      extraArgs:
-        - --enable-insecure-login
-        - --enable-skip-login
-        - --disable-settings-authorizer
-        - --token-ttl=43200
       ingress:
         enabled: true
         ingressClassName: "internal"
@@ -45,7 +40,7 @@ spec:
           cert-manager.io/private-key-size: "384"
           external-dns.powerdns.arpa/enabled: "true"
           external-dns.alpha.kubernetes.io/target: ingress.${SECRET_DOMAIN}
-          nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+          nginx.ingress.kubernetes.io/proxy-body-size: "100m"
           nginx.ingress.kubernetes.io/auth-url: |-
             http://ak-outpost-authentik-embedded-outpost.security.svc.cluster.local:9000/outpost.goauthentik.io/auth/nginx
           nginx.ingress.kubernetes.io/auth-signin: |-
