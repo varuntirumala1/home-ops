@@ -55,11 +55,9 @@ spec:
         nginx.ingress.kubernetes.io/auth-snippet: |
           proxy_set_header X-Forwarded-Host $http_host;
       hosts:
-        - &host kubernetes.${SECRET_DOMAIN}
+        - "kubernetes.${SECRET_DOMAIN}"
       tls:
-        - hosts:
-            - *host
-          secretName: kubernetes-dashboard-tls
+        secretName: "kubernetes-dashboard-tls"
     metricsScraper:
       enabled: true
     serviceMonitor:
