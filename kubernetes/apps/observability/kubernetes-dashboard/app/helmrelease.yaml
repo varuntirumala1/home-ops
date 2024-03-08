@@ -37,7 +37,8 @@ spec:
       - --token-ttl=43200
     ingress:
       enabled: true
-      className: internal
+#      className: internal
+      ingressClassName: "internal"
       annotations:
         cert-manager.io/cluster-issuer: gts-production
         cert-manager.io/private-key-algorithm: ECDSA
