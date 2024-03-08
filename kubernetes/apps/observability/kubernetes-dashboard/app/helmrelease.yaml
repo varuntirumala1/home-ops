@@ -34,7 +34,7 @@ spec:
       - --enable-insecure-login
       - --enable-skip-login
       - --disable-settings-authorizer
-      - --token-ttl=86400
+      - --token-ttl=43200
     ingress:
       enabled: true
       className: internal
