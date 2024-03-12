@@ -125,7 +125,7 @@ spec:
           port-forward:
             image:
               repository: ghcr.io/bjw-s/gluetun-qb-port-sync
-              tag: v0.0.1@sha256:63e510461b5948fddb6277ca7551e9f017e8a1603b8a012c7e83e38b17661164
+              tag: v0.0.1@sha256:02400b1b8511e56c2c1fe371d20bf76fdb104980b4509b11294b1c9873bfca9f
             env:
               GLUETUN_CONTROL_SERVER_HOST: localhost
               GLUETUN_CONTROL_SERVER_PORT: 8000
