@@ -159,5 +159,7 @@ spec:
         type: nfs
         server: 192.168.112.5
         path: /mnt/flashstor/media
-        globalMounts:
-          - path: /media
+        advancedMounts:
+          qbittorrent:
+            app:
+              - path: /media
