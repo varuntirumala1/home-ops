@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 2.6.0
+      version: 3.0.2
       interval: 30m
       sourceRef:
         kind: HelmRepository
@@ -28,8 +28,7 @@ spec:
     keepHistory: false
   values:
     controllers:
-      main:
-        type: statefulset
+      qbittorrent:
         annotations:
           configmap.reloader.stakater.com/reload: qbittorrent-scripts
           secret.reloader.stakater.com/reload: qbittorrent-secret
@@ -40,7 +39,7 @@ spec:
             supplementalGroups:
               - 10000
         containers:
-          main:
+          app:
             nameOverride: qbittorrent
             image:
               repository: ghcr.io/onedr0p/qbittorrent
@@ -145,14 +144,14 @@ spec:
                   - ALL
 
     service:
-      main:
+      app:
+        controller: qbittorrent
         ports:
           http:
             port: *port
 
     ingress:
-      main:
-        enabled: true
+      app:
         className: "internal"
         annotations:
           external-dns.powerdns.arpa/enabled: "true"
@@ -173,32 +172,35 @@ spec:
             paths:
               - path: /
                 service:
-                  name: main
+                  identifier: app
                   port: http
         tls:
           - hosts:
               - *host
             secretName: qbittorrent-cert
+
     persistence:
       config:
         enabled: true
         existingClaim: qbittorrent-config
         advancedMounts:
-          main:
-            main:
+          qbittorrent:
+            app:
               - path: /config
       scripts:
         type: configMap
         name: qbittorrent-scripts
         defaultMode: 0775
         advancedMounts:
-          main:
-            main:
+          qbittorrent:
+            app:
               - path: /scripts
                 readOnly: true
       media:
         type: nfs
         server: 192.168.112.5
         path: /mnt/flashstor/media
-        globalMounts:
-          - path: /media
+        advancedMounts:
+          qbittorrent:
+            app:
+              - path: /media
