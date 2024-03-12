@@ -1,5 +1,5 @@
 ---
-# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/app-template-3.0.2/charts/other/app-template/schemas/helmrelease-helm-v2beta2.schema.json
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2beta2.schema.json
 apiVersion: helm.toolkit.fluxcd.io/v2beta2
 kind: HelmRelease
 metadata:
@@ -10,100 +10,135 @@ spec:
     spec:
       chart: app-template
       version: 3.0.2
-      interval: 30m
       sourceRef:
         kind: HelmRepository
         name: bjw-s
         namespace: flux-system
-
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      strategy: rollback
+      retries: 3
+  dependsOn:
+    - name: qbittorrent
+      namespace: downloads
   values:
     controllers:
-      prune:
+      tagging:
         type: cronjob
-
-        cronjob:
+        cronjob: &cronJobSpec
           schedule: "@hourly"
+          timeZone: &timeZone America/New_York
           concurrencyPolicy: Forbid
           successfulJobsHistory: 1
           failedJobsHistory: 1
-
-        pod:
-          restartPolicy: OnFailure
-          securityContext: &podSecurityContext
-            runAsUser: ${APP_UID}
-            runAsGroup: ${APP_GID}
-            runAsNonRoot: true
-
         initContainers:
           tagging:
             image: &image
               repository: ghcr.io/buroa/qbtools
               tag: v0.15.0@sha256:067a68a0c7b2f522b7527e7bb48cf18614d46c16fcbcd16561d1bbc7f7f983fd
-            args:
-              - tagging
-              - --added-on
-              - --expired
-              - --last-activity
-              - --not-working
-              - --sites
-              - --unregistered
-              - --server
-              - qbittorrent.downloads.svc.cluster.local
-              - --port
-              - "8080"
-              - --config
-              - /config/config.yaml
+            env: &env
+              TZ: *timeZone
+            args: [
+              "tagging",
+              "--added-on",
+              "--expired",
+              "--last-activity",
+              "--sites",
+              "--unregistered",
+              "--server", "qbittorrent.downloads.svc.cluster.local",
+              "--port", "8080",
+              "--config", "/config/config.yaml"
+            ]
             resources: &resources
               requests:
-                memory: 128Mi
                 cpu: 25m
               limits:
-                memory: 256Mi
-            securityContext: &containerSecurityContext
-              allowPrivilegeEscalation: false
-              readOnlyRootFilesystem: true
-              capabilities:
-                drop:
-                  - ALL
-
+                memory: 256M
         containers:
-          app:
+          unregistered:
             image: *image
-            args:
-              - prune
-              - --exclude-category
-              - manual
-              - --include-tag
-              - unregistered
-              # - --dry-run
-              - --server
-              - qbittorrent.downloads.svc.cluster.local
-              - --port
-              - "8080"
+            env: *env
+            args: [
+              "prune",
+              "--exclude-category", "manual",
+              "--include-tag", "unregistered",
+              # "--dry-run",
+              "--server", "qbittorrent.downloads.svc.cluster.local",
+              "--port", "8080"
+            ]
             resources: *resources
-            securityContext: *containerSecurityContext
-
-      reannounce:
+          expired:
+            image: *image
+            env: *env
+            args: [
+              "prune",
+              "--exclude-category", "manual",
+              "--exclude-category", "overlord",
+              "--include-tag", "expired", # defined in config.yaml
+              "--include-tag", "added:7d",
+              # "--dry-run",
+              "--server", "qbittorrent.downloads.svc.cluster.local",
+              "--port", "8080"
+            ]
+            resources: *resources
         pod:
-          securityContext: *podSecurityContext
+          restartPolicy: OnFailure
+          securityContext: &securityContext
+            runAsUser: ${APP_UID}
+            runAsGroup: ${APP_GID}
+            runAsNonRoot: true
+      orphaned:
+        type: cronjob
+        cronjob:
+          <<: *cronJobSpec
+          schedule: "@daily"
         containers:
           app:
             image: *image
-            args:
-              - reannounce
-              - --process-seeding
-              - --server
-              - qbittorrent.downloads.svc.cluster.local
-              - --port
-              - "8080"
+            env: *env
+            args: [
+              "orphaned",
+              "--exclude-pattern", "*_unpackerred*",
+              "--exclude-pattern", "*/manual/*",
+              # "--dry-run",
+              "--server", "qbittorrent.downloads.svc.cluster.local",
+              "--port", "8080"
+            ]
             resources: *resources
-            securityContext: *containerSecurityContext
-
+        pod:
+          restartPolicy: OnFailure
+          securityContext: *securityContext
+      reannounce:
+        containers:
+          app:
+            image: *image
+            env: *env
+            args: [
+              "reannounce",
+              "--process-seeding",
+              "--server", "qbittorrent.downloads.svc.cluster.local",
+              "--port", "8080"
+            ]
+            resources: *resources
+        pod:
+          securityContext: *securityContext
     persistence:
-      config-file:
+      secret-file:
         type: secret
         name: qbtools-secret
         globalMounts:
           - path: /config/config.yaml
             subPath: config.yaml
             readOnly: true
+      media:
+        type: nfs
+        server: 192.168.112.5
+        path: /mnt/flashstor/media
+        advancedMounts:
+          orphaned:
+            app:
+              - path: /media
