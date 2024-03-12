@@ -68,58 +68,17 @@ spec:
             image:
               repository: docker.io/qmcgaw/gluetun
               tag: latest@sha256:b1ad4d0b12f6ca703eab97bf391b4e2bfeb134ee9c16d03d8c0e60bf47f544b3
+            env:
+              FIREWALL_INPUT_PORTS: 8080
+              FIREWALL_OUTBOUND_SUBNETS: 10.42.0.0/16,10.43.0.0/16 # Allow access to k8s subnets
+            envFrom:
+              - secretRef:
+                  name: qbittorrent-secret
             securityContext:
               capabilities:
                 add:
                   - NET_ADMIN
               allowPrivilegeEscalation: false
-            env:
-              - name: VPN_INTERFACE
-                value: wg0
-              - name: VPN_ENDPOINT_PORT
-                value: "51820"
-              - name: FIREWALL_INPUT_PORTS
-                value: "8080"
-              - name: FIREWALL_OUTBOUND_SUBNETS
-                # Allow access to k8s subnets
-                value: "10.42.0.0/16,10.43.0.0/16"
-              - name: VPN_PORT_FORWARDING
-                value: "on"
-              - name: WIREGUARD_PRIVATE_KEY
-                valueFrom:
-                  secretKeyRef:
-                    name: qbittorrent-secret
-                    key: WIREGUARD_PRIVATE_KEY
-              - name: WIREGUARD_PUBLIC_KEY
-                valueFrom:
-                  secretKeyRef:
-                    name: qbittorrent-secret
-                    key: WIREGUARD_PUBLIC_KEY
-              - name: WIREGUARD_ADDRESSES
-                valueFrom:
-                  secretKeyRef:
-                    name: qbittorrent-secret
-                    key: WIREGUARD_ADDRESSES
-              - name: VPN_SERVICE_PROVIDER
-                valueFrom:
-                  secretKeyRef:
-                    name: qbittorrent-secret
-                    key: VPN_SERVICE_PROVIDER
-              - name: VPN_TYPE
-                valueFrom:
-                  secretKeyRef:
-                    name: qbittorrent-secret
-                    key: VPN_TYPE
-              - name: VPN_ENDPOINT_IP
-                valueFrom:
-                  secretKeyRef:
-                    name: qbittorrent-secret
-                    key: VPN_ENDPOINT_IP
-              - name: VPN_PORT_FORWARDING_PROVIDER
-                valueFrom:
-                  secretKeyRef:
-                    name: qbittorrent-secret
-                    key: VPN_PORT_FORWARDING_PROVIDER
 
           port-forward:
             image:
