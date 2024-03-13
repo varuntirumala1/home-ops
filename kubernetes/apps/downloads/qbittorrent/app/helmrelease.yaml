@@ -140,7 +140,6 @@ spec:
 
     persistence:
       config:
-        enabled: true
         existingClaim: qbittorrent-config
         advancedMounts:
           qbittorrent:
