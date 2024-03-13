@@ -29,9 +29,8 @@ spec:
   values:
     controllers:
       sabnzbd:
-        type: statefulset
         annotations:
-          secret.reloader.stakater.com/reload: sabnzbd-secret
+          reloader.stakater.com/auto: "true"
         pod:
           securityContext:
             fsGroup: ${APP_GID}
