@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 2.6.0
+      version: 3.0.2
       interval: 30m
       sourceRef:
         kind: HelmRepository
@@ -27,11 +27,11 @@ spec:
     keepHistory: false
   values:
     controllers:
-      main:
+      flaresolverr:
         annotations:
           reloader.stakater.com/auto: "true"
         containers:
-          main:
+          app:
             image:
               repository: ghcr.io/flaresolverr/flaresolverr
               tag: v3.3.16@sha256:088412db1051d04ab32c902266510011aec1dc9f7a3a3bda3f58b93186591347
@@ -39,7 +39,7 @@ spec:
       TZ: America/New_York
       LOG_LEVEL: info
     service:
-      main:
+      app:
         ports:
           http:
             port: 8191
