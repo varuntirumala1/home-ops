@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 2.6.0
+      version: 3.0.2
       interval: 30m
       sourceRef:
         kind: HelmRepository
@@ -29,14 +29,16 @@ spec:
 
   values:
     controllers:
-      main:
+      sonarr:
         annotations:
           configmap.reloader.stakater.com/reload: sonarr-dnsdist, sonarr-resolv, sonarr-configmap
           secret.reloader.stakater.com/reload: sonarr-secret
         pod:
           securityContext:
-            fsGroup: 568
-            fsGroupChangePolicy: OnRootMismatch
+            fsGroup: ${APP_GID}
+            fsGroupChangePolicy: "OnRootMismatch"
+            supplementalGroups:
+              - 10000
         initContainers:
           01-init-db:
             image:
@@ -46,7 +48,8 @@ spec:
               - secretRef:
                   name: sonarr-secret
         containers:
-          main:
+          app:
+            nameOverride: sonarr
             image:
               repository: ghcr.io/onedr0p/sonarr-develop
               tag: 4.0.2.1312@sha256:79a3e62a9218d5514d524caa96c1db58d2574adb5331314d243e6bf53a35e6b4
@@ -68,18 +71,21 @@ spec:
                 memory: 512M
               limits:
                 memory: 768M
+            securityContext:
+              runAsUser: ${APP_UID}
+              runAsGroup: ${APP_GID}
+              runAsNonRoot: true
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop:
+                  - ALL
 
           gluetun:
             image:
               repository: docker.io/qmcgaw/gluetun
               tag: latest@sha256:b1ad4d0b12f6ca703eab97bf391b4e2bfeb134ee9c16d03d8c0e60bf47f544b3
-            networkPolicy:
-              enabled: false
             env:
-              - name: VPN_INTERFACE
-                value: wg0
-              - name: VPN_ENDPOINT_PORT
-                value: "51820"
               - name: FIREWALL_INPUT_PORTS
                 value: "80"
               - name: FIREWALL_OUTBOUND_SUBNETS
@@ -93,53 +99,39 @@ spec:
                 value: "127.0.0.2"
               - name: HEALTH_TARGET_ADDRESS
                 value: 1.1.1.1:443
-              - name: WIREGUARD_PRIVATE_KEY
-                valueFrom:
-                  secretKeyRef:
-                    name: sonarr-secret
-                    key: WIREGUARD_PRIVATE_KEY
-              - name: WIREGUARD_PUBLIC_KEY
-                valueFrom:
-                  secretKeyRef:
-                    name: sonarr-secret
-                    key: WIREGUARD_PUBLIC_KEY
-              - name: WIREGUARD_ADDRESSES
-                valueFrom:
-                  secretKeyRef:
-                    name: sonarr-secret
-                    key: WIREGUARD_ADDRESSES
-              - name: VPN_SERVICE_PROVIDER
-                valueFrom:
-                  secretKeyRef:
-                    name: sonarr-secret
-                    key: VPN_SERVICE_PROVIDER
-              - name: VPN_TYPE
-                valueFrom:
-                  secretKeyRef:
-                    name: sonarr-secret
-                    key: VPN_TYPE
-              - name: VPN_ENDPOINT_IP
-                valueFrom:
-                  secretKeyRef:
-                    name: sonarr-secret
-                    key: VPN_ENDPOINT_IP
+            envFrom:
+              - secretRef:
+                  name: sonarr-secret
             securityContext:
-              privileged: true
+              capabilities:
+                add:
+                  - NET_ADMIN
+              allowPrivilegeEscalation: false
+
 
           dnsdist:
             image:
               repository: docker.io/powerdns/dnsdist-18
               tag: 1.8.3@sha256:5f2e92f6363db2bd5bd40319ac2fb10e3a583f6ff5fb5d96a948d9c8b93299b3
+            securityContext:
+              runAsUser: ${APP_UID}
+              runAsGroup: ${APP_GID}
+              runAsNonRoot: true
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: false
+              capabilities:
+                drop:
+                  - ALL
 
     service:
-      main:
+      app:
+        controller: sonarr
         ports:
           http:
             port: *port
 
     ingress:
-      main:
-        enabled: true
+      app:
         className: "internal"
         annotations:
           cert-manager.io/cluster-issuer: gts-production
@@ -161,45 +153,52 @@ spec:
             paths:
               - path: /
                 service:
-                  name: main
+                  identifier: app
                   port: http
         tls:
           - hosts:
               - *host
             secretName: sonarr-cert
+
     persistence:
       config:
-        enabled: true
         existingClaim: sonarr-config
-      scripts:
-        enabled: true
+
+      pushover-notify:
         type: configMap
         name: sonarr-configmap
-        subPath: pushover-notify.sh
-        mountPath: /scripts/pushover-notify.sh
         defaultMode: 0775
-        readOnly: true
+        globalMounts:
+          - path: /scripts/pushover-notify.sh
+            subPath: pushover-notify.sh
+            readOnly: true
+
+      tmp:
+        type: emptyDir
+
       media:
         type: nfs
         server: 192.168.112.5
         path: /mnt/flashstor/media
         globalMounts:
           - path: /media
+
       dnsdist-config:
         type: configMap
         name: sonarr-dnsdist
         advancedMounts:
-          main:
+          sonarr:
             dnsdist:
               - path: /etc/dnsdist/dnsdist.conf
                 subPath: dnsdist.conf
                 readOnly: true
+
       sonarr-resolv-config:
         type: configMap
         name: sonarr-resolv
         advancedMounts:
-          main:
-            main:
+          sonarr:
+            app:
               - path: /etc/resolv.conf
                 subPath: resolv.conf
                 readOnly: true
