@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 2.6.0
+      version: 3.0.2
       interval: 30m
       sourceRef:
         kind: HelmRepository
@@ -28,7 +28,7 @@ spec:
     keepHistory: false
   values:
     controllers:
-      main:
+      sabnzbd:
         type: statefulset
         annotations:
           secret.reloader.stakater.com/reload: sabnzbd-secret
@@ -39,7 +39,7 @@ spec:
             supplementalGroups:
               - 10000
         containers:
-          main:
+          app:
             nameOverride: sabnzbd
             image:
               repository: ghcr.io/onedr0p/sabnzbd
@@ -72,66 +72,36 @@ spec:
               capabilities:
                 drop:
                   - ALL
+
           gluetun:
             image:
               repository: docker.io/qmcgaw/gluetun
               tag: latest@sha256:b1ad4d0b12f6ca703eab97bf391b4e2bfeb134ee9c16d03d8c0e60bf47f544b3
-            securityContext:
-              capabilities:
-                add:
-                  - NET_ADMIN
-              allowPrivilegeEscalation: false
             env:
-              - name: VPN_INTERFACE
-                value: wg0
-              - name: VPN_ENDPOINT_PORT
-                value: "51820"
               - name: FIREWALL_INPUT_PORTS
                 value: "80"
               - name: FIREWALL_OUTBOUND_SUBNETS
                 # Allow access to k8s subnets
                 value: "10.42.0.0/16,10.43.0.0/16"
-              - name: WIREGUARD_PRIVATE_KEY
-                valueFrom:
-                  secretKeyRef:
-                    name: sabnzbd-secret
-                    key: WIREGUARD_PRIVATE_KEY
-              - name: WIREGUARD_PUBLIC_KEY
-                valueFrom:
-                  secretKeyRef:
-                    name: sabnzbd-secret
-                    key: WIREGUARD_PUBLIC_KEY
-              - name: WIREGUARD_ADDRESSES
-                valueFrom:
-                  secretKeyRef:
-                    name: sabnzbd-secret
-                    key: WIREGUARD_ADDRESSES
-              - name: VPN_SERVICE_PROVIDER
-                valueFrom:
-                  secretKeyRef:
-                    name: sabnzbd-secret
-                    key: VPN_SERVICE_PROVIDER
-              - name: VPN_TYPE
-                valueFrom:
-                  secretKeyRef:
-                    name: sabnzbd-secret
-                    key: VPN_TYPE
-              - name: VPN_ENDPOINT_IP
-                valueFrom:
-                  secretKeyRef:
-                    name: sabnzbd-secret
-                    key: VPN_ENDPOINT_IP
+            envFrom:
+            - secretRef:
+                name: sabnzbd-secret
+            securityContext:
+              capabilities:
+                add:
+                  - NET_ADMIN
+              allowPrivilegeEscalation: false
 
     service:
-      main:
+      app:
+        controller: sabnzbd
         ports:
           http:
             port: *port
 
     ingress:
-      main:
-        enabled: true
-        className: internal
+      app:
+        className: "internal"
         annotations:
           external-dns.powerdns.arpa/enabled: "true"
           external-dns.alpha.kubernetes.io/target: ingress.${SECRET_DOMAIN}
@@ -151,7 +121,7 @@ spec:
             paths:
               - path: /
                 service:
-                  name: main
+                  identifier: app
                   port: http
         tls:
           - hosts:
@@ -171,6 +141,6 @@ spec:
       temp:
         type: emptyDir
         advancedMounts:
-          main:
-            main:
+          sabnzbd:
+            app:
               - path: /tmp
