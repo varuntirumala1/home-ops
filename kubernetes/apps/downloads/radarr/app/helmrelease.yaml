@@ -162,17 +162,18 @@ spec:
 
     persistence:
       config:
-        enabled: true
         existingClaim: radarr-config
 
-      scripts:
-        enabled: true
+      pushover-notify:
         type: configMap
         name: radarr-configmap
-        subPath: pushover-notify.sh
-        mountPath: /scripts/pushover-notify.sh
         defaultMode: 0775
-        readOnly: true
+        globalMounts:
+          - path: /scripts/pushover-notify.sh
+            subPath: pushover-notify.sh
+            readOnly: true
+      tmp:
+        type: emptyDir
 
       media:
         type: nfs
