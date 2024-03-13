@@ -10,7 +10,7 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 2.6.0
+      version: 3.0.2
       interval: 30m
       sourceRef:
         kind: HelmRepository
@@ -29,14 +29,16 @@ spec:
     keepHistory: false
   values:
     controllers:
-      main:
+      prowlarr:
         annotations:
           configmap.reloader.stakater.com/reload: prowlarr-dnsdist, prowlarr-resolv
           secret.reloader.stakater.com/reload: prowlarr-secret
         pod:
           securityContext:
-            fsGroup: 568
+            fsGroup: ${APP_GID}
             fsGroupChangePolicy: "OnRootMismatch"
+            supplementalGroups:
+              - 10000
         initContainers:
           01-init-db:
             image:
@@ -46,7 +48,7 @@ spec:
               - secretRef:
                   name: prowlarr-secret
         containers:
-          main:
+          app:
             image:
               repository: ghcr.io/onedr0p/prowlarr-develop
               tag: 1.14.1.4316@sha256:c2480d34c333706fad7db15e59c882268ce95b9147fcb0733e18383b968dbedf
@@ -65,20 +67,20 @@ spec:
                 memory: 128Mi
               limits:
                 memory: 256Mi
-
+            securityContext:
+              runAsUser: ${APP_UID}
+              runAsGroup: ${APP_GID}
+              runAsNonRoot: true
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop:
+                  - ALL
           gluetun:
             image:
               repository: docker.io/qmcgaw/gluetun
               tag: latest@sha256:b1ad4d0b12f6ca703eab97bf391b4e2bfeb134ee9c16d03d8c0e60bf47f544b3
-            securityContext:
-              privileged: true
-            networkPolicy:
-              enabled: false
             env:
-              - name: VPN_INTERFACE
-                value: wg0
-              - name: VPN_ENDPOINT_PORT
-                value: "51820"
               - name: FIREWALL_INPUT_PORTS
                 value: "9696"
               - name: FIREWALL_OUTBOUND_SUBNETS
@@ -92,51 +94,36 @@ spec:
                 value: "127.0.0.2"
               - name: HEALTH_TARGET_ADDRESS
                 value: 1.1.1.1:443
-              - name: WIREGUARD_PRIVATE_KEY
-                valueFrom:
-                  secretKeyRef:
-                    name: prowlarr-secret
-                    key: WIREGUARD_PRIVATE_KEY
-              - name: WIREGUARD_PUBLIC_KEY
-                valueFrom:
-                  secretKeyRef:
-                    name: prowlarr-secret
-                    key: WIREGUARD_PUBLIC_KEY
-              - name: WIREGUARD_ADDRESSES
-                valueFrom:
-                  secretKeyRef:
-                    name: prowlarr-secret
-                    key: WIREGUARD_ADDRESSES
-              - name: VPN_SERVICE_PROVIDER
-                valueFrom:
-                  secretKeyRef:
-                    name: prowlarr-secret
-                    key: VPN_SERVICE_PROVIDER
-              - name: VPN_TYPE
-                valueFrom:
-                  secretKeyRef:
-                    name: prowlarr-secret
-                    key: VPN_TYPE
-              - name: VPN_ENDPOINT_IP
-                valueFrom:
-                  secretKeyRef:
-                    name: prowlarr-secret
-                    key: VPN_ENDPOINT_IP
-
+            envFrom:
+              - secretRef:
+                  name: autobrr-secret
+            securityContext:
+              capabilities:
+                add:
+                  - NET_ADMIN
+              allowPrivilegeEscalation: false
           dnsdist:
             image:
               repository: docker.io/powerdns/dnsdist-18
               tag: 1.8.3@sha256:5f2e92f6363db2bd5bd40319ac2fb10e3a583f6ff5fb5d96a948d9c8b93299b3
+            securityContext:
+              runAsUser: ${APP_UID}
+              runAsGroup: ${APP_GID}
+              runAsNonRoot: true
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: false
+              capabilities:
+                drop:
+                  - ALL
 
     service:
-      main:
+      app:
         ports:
           http:
             port: *port
 
     ingress:
-      main:
-        enabled: true
+      app:
         className: "internal"
         annotations:
           external-dns.powerdns.arpa/enabled: "true"
@@ -157,7 +144,7 @@ spec:
             paths:
               - path: /
                 service:
-                  name: main
+                  identifier: app
                   port: http
         tls:
           - hosts:
@@ -171,7 +158,7 @@ spec:
         type: configMap
         name: prowlarr-dnsdist
         advancedMounts:
-          main:
+          prowlarr:
             dnsdist:
               - path: /etc/dnsdist/dnsdist.conf
                 subPath: dnsdist.conf
@@ -180,8 +167,8 @@ spec:
         type: configMap
         name: prowlarr-resolv
         advancedMounts:
-          main:
-            main:
+          prowlarr:
+            app:
               - path: /etc/resolv.conf
                 subPath: resolv.conf
                 readOnly: true
