@@ -1,4 +1,3 @@
----
 # yaml-language-server: $schema=https://kubernetes-schemas.devbu.io/helm.toolkit.fluxcd.io/helmrelease_v2beta1.json
 apiVersion: helm.toolkit.fluxcd.io/v2beta2
 kind: HelmRelease
@@ -28,14 +27,16 @@ spec:
     keepHistory: false
   values:
     controllers:
-      main:
+      autobrr:
         annotations:
           configmap.reloader.stakater.com/reload: autobrr-dnsdist, autobrr-configmap, autobrr-resolv
           secret.reloader.stakater.com/reload: autobrr-secret
         pod:
           securityContext:
-            fsGroup: 568
-            fsGroupChangePolicy: OnRootMismatch
+            fsGroup: ${APP_GID}
+            fsGroupChangePolicy: "OnRootMismatch"
+            supplementalGroups:
+              - 10000
         initContainers:
           01-init-db:
             image:
@@ -45,7 +46,8 @@ spec:
               - secretRef:
                   name: autobrr-secret
         containers:
-          main:
+          app:
+            nameOverride: autobrr
             image:
               repository: ghcr.io/autobrr/autobrr
               tag: v1.39.1@sha256:7149943f3f6a528ea653662272e8a2c78156cdbf51fd3313911eb57a03378a50
@@ -62,22 +64,19 @@ spec:
               limits:
                 memory: 256Mi
             securityContext:
-              runAsUser: 568
-              runAsGroup: 568
-
+              runAsUser: ${APP_UID}
+              runAsGroup: ${APP_GID}
+              runAsNonRoot: true
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop:
+                  - ALL
           gluetun:
             image:
               repository: docker.io/qmcgaw/gluetun
               tag: latest@sha256:b1ad4d0b12f6ca703eab97bf391b4e2bfeb134ee9c16d03d8c0e60bf47f544b3
-            securityContext:
-              privileged: true
-            networkPolicy:
-              enabled: false
             env:
-              - name: VPN_INTERFACE
-                value: wg0
-              - name: VPN_ENDPOINT_PORT
-                value: "51820"
               - name: FIREWALL_INPUT_PORTS
                 value: "80"
               - name: FIREWALL_OUTBOUND_SUBNETS
@@ -91,51 +90,36 @@ spec:
                 value: "127.0.0.2"
               - name: HEALTH_TARGET_ADDRESS
                 value: 1.1.1.1:443
-              - name: WIREGUARD_PRIVATE_KEY
-                valueFrom:
-                  secretKeyRef:
-                    name: autobrr-secret
-                    key: WIREGUARD_PRIVATE_KEY
-              - name: WIREGUARD_PUBLIC_KEY
-                valueFrom:
-                  secretKeyRef:
-                    name: autobrr-secret
-                    key: WIREGUARD_PUBLIC_KEY
-              - name: WIREGUARD_ADDRESSES
-                valueFrom:
-                  secretKeyRef:
-                    name: autobrr-secret
-                    key: WIREGUARD_ADDRESSES
-              - name: VPN_SERVICE_PROVIDER
-                valueFrom:
-                  secretKeyRef:
-                    name: autobrr-secret
-                    key: VPN_SERVICE_PROVIDER
-              - name: VPN_TYPE
-                valueFrom:
-                  secretKeyRef:
-                    name: autobrr-secret
-                    key: VPN_TYPE
-              - name: VPN_ENDPOINT_IP
-                valueFrom:
-                  secretKeyRef:
-                    name: autobrr-secret
-                    key: VPN_ENDPOINT_IP
-
+            envFrom:
+              - secretRef:
+                  name: autobrr-secret
+            securityContext:
+              capabilities:
+                add:
+                  - NET_ADMIN
+              allowPrivilegeEscalation: false
           dnsdist:
             image:
               repository: docker.io/powerdns/dnsdist-18
               tag: 1.8.3@sha256:5f2e92f6363db2bd5bd40319ac2fb10e3a583f6ff5fb5d96a948d9c8b93299b3
+            securityContext:
+              runAsUser: ${APP_UID}
+              runAsGroup: ${APP_GID}
+              runAsNonRoot: true
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: false
+              capabilities:
+                drop:
+                  - ALL
 
     service:
-      main:
+      app:
         ports:
           http:
             port: *port
 
     ingress:
-      main:
-        enabled: true
+      app:
         className: "internal"
         annotations:
           external-dns.powerdns.arpa/enabled: "true"
@@ -156,7 +140,7 @@ spec:
             paths:
               - path: /
                 service:
-                  name: main
+                  identifier: app
                   port: http
         tls:
           - hosts:
@@ -171,7 +155,7 @@ spec:
         type: configMap
         name: autobrr-dnsdist
         advancedMounts:
-          main:
+          autobrr:
             dnsdist:
               - path: /etc/dnsdist/dnsdist.conf
                 subPath: dnsdist.conf
@@ -180,8 +164,8 @@ spec:
         type: configMap
         name: autobrr-resolv
         advancedMounts:
-          main:
-            main:
+          autobrr:
+            app:
               - path: /etc/resolv.conf
                 subPath: resolv.conf
                 readOnly: true
