@@ -72,6 +72,7 @@ spec:
               capabilities:
                 drop:
                   - ALL
+
           gluetun:
             image:
               repository: docker.io/qmcgaw/gluetun
@@ -98,6 +99,7 @@ spec:
                 add:
                   - NET_ADMIN
               allowPrivilegeEscalation: false
+
           dnsdist:
             image:
               repository: docker.io/powerdns/dnsdist-18
@@ -150,7 +152,8 @@ spec:
 
     persistence:
       config:
-        enabled: true
+        type: emptyDir
+      tmp:
         type: emptyDir
       dnsdist-config:
         type: configMap
