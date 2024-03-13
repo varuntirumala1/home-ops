@@ -49,6 +49,7 @@ spec:
                   name: prowlarr-secret
         containers:
           app:
+            nameOverride: prowlarr
             image:
               repository: ghcr.io/onedr0p/prowlarr-develop
               tag: 1.14.1.4316@sha256:c2480d34c333706fad7db15e59c882268ce95b9147fcb0733e18383b968dbedf
