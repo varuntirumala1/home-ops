@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 2.6.0
+      version: 3.0.2
       interval: 30m
       sourceRef:
         kind: HelmRepository
@@ -28,7 +28,7 @@ spec:
     keepHistory: false
   values:
     controllers:
-      main:
+      cross-seed:
         annotations:
           secret.reloader.stakater.com/reload: cross-seed-secret
         pod:
@@ -41,13 +41,15 @@ spec:
             supplementalGroups:
               - 10000
         containers:
-          main:
+          app:
             image:
               repository: ghcr.io/cross-seed/cross-seed
               tag: 5.9.2@sha256:6abdca45f0ecfd8d23a3035beefa716a14b66f23c14854631fe369d1ad346f1e
               pullPolicy: IfNotPresent
             args:
               - daemon
+            env:
+              CROSSSEED_PORT: &port 2468
             resources:
               requests:
                 cpu: 10m
@@ -61,10 +63,11 @@ spec:
                 drop:
                   - ALL
     service:
-      main:
+      app:
+        controller: cross-seed
         ports:
           http:
-            port: 2468
+            port: *port
     persistence:
       config:
         enabled: true
