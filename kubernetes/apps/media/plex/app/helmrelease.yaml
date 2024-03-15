@@ -8,7 +8,7 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 2.6.0
+      version: 3.0.2
       interval: 30m
       sourceRef:
         kind: HelmRepository
@@ -27,12 +27,10 @@ spec:
     keepHistory: false
   values:
     controllers:
-      main:
+      plex:
         annotations:
           reloader.stakater.com/auto: "true"
-        strategy: Recreate
         pod:
-          enableServiceLinks: false
           nodeSelector:
             nvidia.com/gpu.present: "true"
           runtimeClassName: nvidia
@@ -44,10 +42,24 @@ spec:
             supplementalGroups: [44, 105, 10000]
 
         containers:
-          main:
+          app:
+            nameOverride: plex
             image:
               repository: ghcr.io/onedr0p/plex
               tag: 1.40.0.7998-c29d4c0c8@sha256:7c4501799f0d5f4f94fcb95a8a47b883528354c779a182a9ae4af118a1fc6b10
+            env:
+              NVIDIA_VISIBLE_DEVICES: all
+              NVIDIA_DRIVER_CAPABILITIES: compute,video,utility
+            probes:
+              liveness:
+                enabled: true
+              readiness:
+                enabled: true
+              startup:
+                enabled: true
+                spec:
+                  failureThreshold: 30
+                  periodSeconds: 5
             resources:
               requests:
                 nvidia.com/gpu: 1  # Request 1 GPU
@@ -56,12 +68,10 @@ spec:
               limits:
                 nvidia.com/gpu: 1  # Limit to 1 GPU
                 memory: 12Gi
-            env:
-              NVIDIA_VISIBLE_DEVICES: all
-              NVIDIA_DRIVER_CAPABILITIES: compute,video,utility
 
     service:
-      main:
+      app:
+        controller: plex
         type: LoadBalancer
         externalTrafficPolicy: Cluster
         annotations:
@@ -71,8 +81,7 @@ spec:
             port: 32400
 
     ingress:
-      main:
-        enabled: true
+      app:
         annotations:
           cert-manager.io/cluster-issuer: gts-production
           cert-manager.io/private-key-algorithm: ECDSA
@@ -86,7 +95,7 @@ spec:
             paths:
               - path: /
                 service:
-                  name: main
+                  identifier: app
                   port: http
         tls:
           - hosts:
@@ -95,15 +104,31 @@ spec:
 
     persistence:
       config:
-        enabled: true
         existingClaim: config-plex-0
+        advancedMounts:
+          plex:
+            app:
+              - path: /config
+
+      logs:
+        type: emptyDir
+        advancedMounts:
+          plex:
+            app:
+              - path: /config/Library/Application Support/Plex Media Server/Logs
+
       plex-media:
         type: nfs
         server: 192.168.112.5
         path: /mnt/flashstor/media
-        globalMounts:
-          - path: /plex-media
+        advancedMounts:
+          plex:
+            app:
+              - path: /plex-media
+
       transcode:
         type: emptyDir
-        globalMounts:
-          - path: /transcode
+        advancedMounts:
+          plex:
+            app:
+              - path: /transcode
