@@ -43,7 +43,7 @@ spec:
             nameOverride: qbittorrent
             image:
               repository: ghcr.io/onedr0p/qbittorrent
-              tag: 4.6.3@sha256:79ac03232dcb3e172fe028f66784f88ed8c49bd5c05ef4a443d675681b37d6ec
+              tag: 4.6.3@sha256:f2895e632fe66299d8ccc68265cc11aea92a232b7d0844de9961864b3e504026
               pullPolicy: IfNotPresent
             env:
               UMASK: "022"
@@ -83,7 +83,7 @@ spec:
           port-forward:
             image:
               repository: ghcr.io/bjw-s/gluetun-qb-port-sync
-              tag: v0.0.1@sha256:02400b1b8511e56c2c1fe371d20bf76fdb104980b4509b11294b1c9873bfca9f
+              tag: v0.0.1@sha256:9e383a76dd76c0d20b1efd16d1b117c7141c751720a925a610fbd1386b9c4378
             env:
               GLUETUN_CONTROL_SERVER_HOST: localhost
               GLUETUN_CONTROL_SERVER_PORT: 8000
