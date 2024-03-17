@@ -8,6 +8,7 @@ module.exports = {
     "http://prowlarr.downloads.svc.cluster.local:9696/106/api?apikey={{ .API_KEY }}", // dc
     "http://prowlarr.downloads.svc.cluster.local:9696/71/api?apikey={{ .API_KEY }}", // oe
     "http://prowlarr.downloads.svc.cluster.local:9696/107/api?apikey={{ .API_KEY }}", // ulcx
+    "http://prowlarr.downloads.svc.cluster.local:9696/141/api?apikey={{ .API_KEY }}", // ar
   ],
   action: "inject",
   includeEpisodes: true,
