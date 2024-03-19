@@ -10,14 +10,3 @@ resources:
   - ./pvc.yaml
 #  - ./networkpolicy.yaml
 #  - ./sabnzbd-volsync-restore.yaml
-configMapGenerator:
-  - name: sabnzbd-dnsdist
-    files:
-      - ./config/dnsdist.conf
-  - name: sabnzbd-resolv
-    files:
-      - ./config/resolv.conf
-generatorOptions:
-  disableNameSuffixHash: true
-  annotations:
-    kustomize.toolkit.fluxcd.io/substitute: disabled
