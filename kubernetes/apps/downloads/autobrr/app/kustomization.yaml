@@ -11,11 +11,5 @@ configMapGenerator:
   - name: autobrr-configmap
     files:
       - config.toml=./config/config.toml
-  - name: autobrr-dnsdist
-    files:
-      - ./config/dnsdist.conf
-  - name: autobrr-resolv
-    files:
-      - ./config/resolv.conf
 generatorOptions:
   disableNameSuffixHash: true
