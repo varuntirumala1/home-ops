@@ -8,3 +8,11 @@ resources:
   - ./helmrelease.yaml
   - ./gatus.yaml
 #  - ./networkpolicy.yaml
+configMapGenerator:
+  - name: sonarr-configmap
+    files:
+      - ./scripts/pushover-notify.sh
+generatorOptions:
+  disableNameSuffixHash: true
+  annotations:
+    kustomize.toolkit.fluxcd.io/substitute: disabled
