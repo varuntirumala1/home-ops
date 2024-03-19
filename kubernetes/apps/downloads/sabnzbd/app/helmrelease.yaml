@@ -72,25 +72,6 @@ spec:
                 drop:
                   - ALL
 
-          gluetun:
-            image:
-              repository: docker.io/qmcgaw/gluetun
-              tag: latest@sha256:f246f81ab32727d1e07d58e47bc39e389316a86107cec5dd4e9c5c3b5666e46c
-            env:
-              - name: FIREWALL_INPUT_PORTS
-                value: "80"
-              - name: FIREWALL_OUTBOUND_SUBNETS
-                # Allow access to k8s subnets
-                value: "10.42.0.0/16,10.43.0.0/16"
-            envFrom:
-            - secretRef:
-                name: sabnzbd-secret
-            securityContext:
-              capabilities:
-                add:
-                  - NET_ADMIN
-              allowPrivilegeEscalation: false
-
     service:
       app:
         controller: sabnzbd
