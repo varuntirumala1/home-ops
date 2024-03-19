@@ -12,12 +12,6 @@ configMapGenerator:
   - name: radarr-configmap
     files:
       - ./scripts/pushover-notify.sh
-  - name: radarr-dnsdist
-    files:
-      - ./config/dnsdist.conf
-  - name: radarr-resolv
-    files:
-      - ./config/resolv.conf
 generatorOptions:
   disableNameSuffixHash: true
   annotations:
