@@ -78,47 +78,6 @@ spec:
                 drop:
                   - ALL
 
-          gluetun:
-            image:
-              repository: docker.io/qmcgaw/gluetun
-              tag: latest@sha256:f246f81ab32727d1e07d58e47bc39e389316a86107cec5dd4e9c5c3b5666e46c
-            env:
-              - name: FIREWALL_INPUT_PORTS
-                value: "9696"
-              - name: FIREWALL_OUTBOUND_SUBNETS
-                # Allow access to k8s subnets
-                value: "10.42.0.0/16,10.43.0.0/16"
-              - name: SHADOWSOCKS
-                value: "on"
-              - name: DOT
-                value: "off"
-              - name: DNS_SERVER
-                value: "127.0.0.2"
-              - name: HEALTH_TARGET_ADDRESS
-                value: 1.1.1.1:443
-            envFrom:
-              - secretRef:
-                  name: prowlarr-secret
-            securityContext:
-              capabilities:
-                add:
-                  - NET_ADMIN
-              allowPrivilegeEscalation: false
-
-          dnsdist:
-            image:
-              repository: docker.io/powerdns/dnsdist-18
-              tag: 1.8.3@sha256:5f2e92f6363db2bd5bd40319ac2fb10e3a583f6ff5fb5d96a948d9c8b93299b3
-            securityContext:
-              runAsUser: ${APP_UID}
-              runAsGroup: ${APP_GID}
-              runAsNonRoot: true
-              allowPrivilegeEscalation: false
-              readOnlyRootFilesystem: false
-              capabilities:
-                drop:
-                  - ALL
-
     service:
       app:
         controller: prowlarr
@@ -160,21 +119,3 @@ spec:
         type: emptyDir
       tmp:
         type: emptyDir
-      dnsdist-config:
-        type: configMap
-        name: prowlarr-dnsdist
-        advancedMounts:
-          prowlarr:
-            dnsdist:
-              - path: /etc/dnsdist/dnsdist.conf
-                subPath: dnsdist.conf
-                readOnly: true
-      prowlarr-resolv-config:
-        type: configMap
-        name: prowlarr-resolv
-        advancedMounts:
-          prowlarr:
-            app:
-              - path: /etc/resolv.conf
-                subPath: resolv.conf
-                readOnly: true
