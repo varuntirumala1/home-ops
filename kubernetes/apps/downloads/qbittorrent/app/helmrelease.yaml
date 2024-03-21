@@ -51,7 +51,7 @@ spec:
               QBT_Application__MemoryWorkingSetLimit:
                 valueFrom:
                   resourceFieldRef:
-                    containerName: app
+                    containerName: qbittorrent
                     resource: limits.memory
                     divisor: 1Mi
               QBT_Preferences__WebUI__AlternativeUIEnabled: false
