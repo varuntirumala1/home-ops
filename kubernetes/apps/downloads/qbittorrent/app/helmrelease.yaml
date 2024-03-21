@@ -67,7 +67,7 @@ spec:
           gluetun:
             image:
               repository: docker.io/qmcgaw/gluetun
-              tag: latest@sha256:f246f81ab32727d1e07d58e47bc39e389316a86107cec5dd4e9c5c3b5666e46c
+              tag: latest@sha256:5b8c47998e717c85072112e10b8f4220fc2d6020c97fd30e238941247a163138
             env:
               FIREWALL_INPUT_PORTS: 8080
               FIREWALL_OUTBOUND_SUBNETS: 10.42.0.0/16,10.43.0.0/16 # Allow access to k8s subnets
@@ -83,7 +83,7 @@ spec:
           port-forward:
             image:
               repository: ghcr.io/bjw-s/gluetun-qb-port-sync
-              tag: v0.0.1@sha256:9e383a76dd76c0d20b1efd16d1b117c7141c751720a925a610fbd1386b9c4378
+              tag: v0.0.1@sha256:a520dbcbbe046ccefec51bfcee12b5a1f63d31a800292b9d60f7fc478481815c
             env:
               GLUETUN_CONTROL_SERVER_HOST: localhost
               GLUETUN_CONTROL_SERVER_PORT: 8000
