@@ -10,6 +10,8 @@ module.exports = {
     "http://prowlarr.downloads.svc.cluster.local:9696/107/api?apikey={{ .API_KEY }}", // ulcx
     "http://prowlarr.downloads.svc.cluster.local:9696/141/api?apikey={{ .API_KEY }}", // ar
     "http://prowlarr.downloads.svc.cluster.local:9696/142/api?apikey={{ .API_KEY }}", // hds
+    "http://prowlarr.downloads.svc.cluster.local:9696/143/api?apikey={{ .API_KEY }}", // otw
+    "http://prowlarr.downloads.svc.cluster.local:9696/144/api?apikey={{ .API_KEY }}", // az
   ],
   action: "inject",
   includeEpisodes: true,
