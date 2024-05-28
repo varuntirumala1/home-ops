@@ -41,7 +41,7 @@ spec:
         secret.reloader.stakater.com/reload:
       initContainers:
         - name: 01-init-db
-          image: ghcr.io/onedr0p/postgres-init:16.2@sha256:3436dfbbc2799332a01361e007e3b408d016cfc235261e1caccc65e6edadf516
+          image: ghcr.io/onedr0p/postgres-init:16.3@sha256:8ba3204f6b293dd168766009aae2ce4fa986a29b931c2d30ac1b30238ac750b8
           envFrom: *envFrom
       autoscaling:
         enabled: true
@@ -74,7 +74,7 @@ spec:
       envFrom: *envFrom
       initContainers:
         - name: 01-init-db
-          image: ghcr.io/onedr0p/postgres-init:16.2@sha256:3436dfbbc2799332a01361e007e3b408d016cfc235261e1caccc65e6edadf516
+          image: ghcr.io/onedr0p/postgres-init:16.3@sha256:8ba3204f6b293dd168766009aae2ce4fa986a29b931c2d30ac1b30238ac750b8
           envFrom: *envFrom
       autoscaling:
         enabled: true
