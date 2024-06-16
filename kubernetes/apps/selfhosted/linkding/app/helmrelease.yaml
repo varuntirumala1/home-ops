@@ -37,7 +37,7 @@ spec:
           main:
             image:
               repository: sissbruecker/linkding
-              tag: 1.27.0@sha256:8b2ea9ac0834c00fcca694ece1e051e210641aa44cceebb8d045e9f72546d9a0
+              tag: 1.31.0@sha256:328c06bcb76128b653828c681d7d648baef7e8453d2d6e25f90bb31d72f997af
             env:
               LD_ENABLE_AUTH_PROXY: "True"
               LD_AUTH_PROXY_USERNAME_HEADER: "HTTP_X_AUTHENTIK_USERNAME"
