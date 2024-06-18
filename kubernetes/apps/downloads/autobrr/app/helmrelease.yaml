@@ -50,7 +50,7 @@ spec:
             nameOverride: autobrr
             image:
               repository: ghcr.io/autobrr/autobrr
-              tag: v1.40.1@sha256:56b9b9d921233c5b32e441e99263af7cb8b056df077e66be2dc2d7c6d341294a
+              tag: v1.43.0@sha256:e26879a64c2251bd1ab42822b4a36f5acc8add8a4d4ec536f634d04745ae7455
             env:
               AUTOBRR__CHECKFORUPDATES: "false"
               AUTOBRR__HOST: 0.0.0.0
