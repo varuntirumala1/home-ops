@@ -97,7 +97,7 @@ spec:
           gluetun:
             image:
               repository: docker.io/qmcgaw/gluetun
-              tag: latest@sha256:bfcf38ffbfbb2f5668e9f718e461b013ca6917129df34ae7a76ad5343fcf35fe
+              tag: latest@sha256:b5e990acf7672262767bb8008f4718491ebcc0d3fd9ac9312eb9ffb88570735f
             env:
               FIREWALL_INPUT_PORTS: 8080
               FIREWALL_OUTBOUND_SUBNETS: 10.42.0.0/16,10.43.0.0/16 # Allow access to k8s subnets
