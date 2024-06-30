@@ -52,7 +52,7 @@ spec:
             nameOverride: sonarr
             image:
               repository: ghcr.io/onedr0p/sonarr-develop
-              tag: 4.0.2.1408@sha256:a6b872a1c52feabdeef37237e00d32e630061de7d468c3289d52ed075c180b9b
+              tag: 4.0.5.1801@sha256:5c4022bd2b0d5c751b8dcb262abc61df917e778405cf4739d5f3d77b81e2f8a3
               pullPolicy: IfNotPresent
             env:
               TZ: America/New_York
